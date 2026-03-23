@@ -211,7 +211,6 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
 </head>
 <body>
 
-<!-- ══ PANTALLA 0: REGISTRO ══════════════════════════════════════════════ -->
 <div id="s0" class="screen active">
 <div class="card">
   <div style="text-align:center;margin-bottom:2rem">
@@ -259,7 +258,6 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
 </div>
 </div>
 
-<!-- ══ PANTALLA 1: CUESTIONARIO ══════════════════════════════════════════ -->
 <div id="s1" class="screen">
   <div class="pw no-print">
     <div class="pi"><span id="plbl">Dimension 1 de 6</span><span id="ppct">0%</span></div>
@@ -268,11 +266,9 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
   <div class="card" id="qcard"></div>
 </div>
 
-<!-- ══ PANTALLA 2: RESULTADOS + PDF ══════════════════════════════════════ -->
 <div id="s2" class="screen">
 <div class="card card-wide">
 
-  <!-- HEADER SCREEN -->
   <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.4rem" class="no-print">
     <div>
       <div class="lbl">Resultados del Assessment</div>
@@ -284,7 +280,6 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
     </button>
   </div>
 
-  <!-- SCREEN RESULTS -->
   <div class="rgrid no-print">
     <div>
       <div class="mb">
@@ -314,9 +309,6 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
   </div>
   <p style="font-size:.7rem;color:rgba(247,244,238,.18);margin-top:.6rem;font-family:var(--mono)" id="rfecha"></p>
 
-  <!-- ════ PDF PAGES (ocultas en pantalla, visibles al imprimir) ══════ -->
-
-  <!-- PDF PAGE 1: PORTADA -->
   <div class="pdf-cover" id="pdf-p1">
     <div class="pdf-cover-bg">
       <div class="pdf-cover-badge">ASSESSMENT DE MADUREZ ANTIFRAUDE · REPORTE CONFIDENCIAL</div>
@@ -332,7 +324,6 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
     </div>
   </div>
 
-  <!-- PDF PAGE 2: RADAR + SCORES -->
   <div class="pdf-s1" id="pdf-p2">
     <div class="pdf-section-title">Resultados por Dimension</div>
     <div class="pdf-s1-grid">
@@ -360,14 +351,12 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
     <div class="pdf-footer"><span>Assessment de Madurez Antifraude — Pagina 2 de 4</span><span id="pdf-f2"></span></div>
   </div>
 
-  <!-- PDF PAGE 3: DETALLE PREGUNTAS -->
   <div class="pdf-s2" id="pdf-p3">
     <div class="pdf-section-title">Detalle de Respuestas por Dimension y Criterio</div>
     <div id="pdf-qdetail"></div>
     <div class="pdf-footer"><span>Assessment de Madurez Antifraude — Pagina 3 de 4</span><span id="pdf-f3"></span></div>
   </div>
 
-  <!-- PDF PAGE 4: PLAN DE ACCION + KPIs -->
   <div class="pdf-s3" id="pdf-p4">
     <div class="pdf-section-title">Plan de Accion Prioritario con KPIs</div>
     <div id="pdf-actions"></div>
@@ -378,11 +367,7 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
     <div class="pdf-footer"><span>Assessment de Madurez Antifraude — Pagina 4 de 4</span><span id="pdf-f4"></span></div>
   </div>
 
-</div><!-- end card-wide -->
-</div><!-- end s2 -->
-
-<!-- MODAL PRIVACIDAD -->
-<div class="mbg" id="modal-p">
+</div></div><div class="mbg" id="modal-p">
 <div class="modal">
   <button class="mx" onclick="closeP()">&#x2715;</button>
   <h3>Politica de Privacidad y Tratamiento de Datos</h3>
@@ -677,7 +662,9 @@ function buildPDF(avg, mat, fecha, gaps){
             {label:'Objetivo (4)',data:Array(6).fill(4),backgroundColor:'transparent',borderColor:'rgba(0,0,0,.1)',borderDash:[3,3],pointRadius:0,borderWidth:1}
           ]
         },
-        options:{responsive:true,maintainAspectRatio:true,
+        options:{
+          animation: false, // CORRECCIÓN: Desactiva la animación para evitar que el PDF salga en blanco
+          responsive:true,maintainAspectRatio:true,
           scales:{r:{min:0,max:4,ticks:{stepSize:1,color:'#888',backdropColor:'transparent',font:{size:8}},
             grid:{color:'rgba(0,0,0,.08)'},pointLabels:{color:'#333',font:{size:9}},angleLines:{color:'rgba(0,0,0,.08)'}}},
           plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:8}}}
@@ -764,7 +751,8 @@ function buildPDF(avg, mat, fecha, gaps){
 
 // ── PRINT ─────────────────────────────────────────────────────────────────────
 function doPrint(){
-  setTimeout(()=>window.print(), 400);
+  // CORRECCIÓN: Se aumenta el tiempo de espera de 400ms a 800ms para asegurar la renderización
+  setTimeout(()=>window.print(), 800);
 }
 
 // ── ENVIO A GOOGLE SHEETS ─────────────────────────────────────────────────────
@@ -826,4 +814,3 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeP()});
 </script>
 </body>
 </html>
-
