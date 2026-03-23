@@ -622,23 +622,18 @@ gaps.slice(0,6).forEach(({d,sc,gap})=>{
   const cls = gap >= 1.5 ? 'pa' : gap >= 0.7 ? 'pm' : 'pb2';
 
   (ACTIONS[d.id]||[]).slice(0,2).forEach(act=>{
-    n++;
-    // Esta parte llena la pantalla y prepara los datos para el PDF
-    ph += `<div class="ai">
-      <div class="ap ${cls}">${n}</div>
-      <div>
-        <strong>${act}</strong>
-        <p>Dimensión: ${d.name}</p>
-        <div class="aimeta"><span class="at">Prioridad: ${prio}</span></div>
-      </div>
-    </div>`;
-      n++;
-      ph+=`<div class="ai"><div class="ap ${priC(gap)}">${n}</div><div>
+  n++;
+  ph += `<div class="ai">
+    <div class="ap ${cls}">${n}</div>
+    <div>
       <strong>${act}</strong>
-      <p>Dimension: ${d.name} &middot; Score: ${sc.toFixed(1)}/4.0 &middot; GAP: ${gap.toFixed(1)}</p>
-      <div class="aimeta"><span class="at">${priL(gap)}</span><span class="at">${plazo(gap)}</span></div>
-      </div></div>`;
-    });
+      <p>Dimensión: ${d.name}</p>
+      <div class="aimeta">
+        <span class="at">Prioridad: ${prio}</span>
+      </div>
+    </div>
+  </div>`;
+});
   });
   if(!ph) ph=`<p style="color:var(--muted);font-size:.875rem">Excelente nivel de madurez. Continua con el programa de mejora continua.</p>`;
   document.getElementById('aplan').innerHTML=ph;
@@ -752,7 +747,7 @@ function buildPDF(avg, mat, fecha, gaps){
   // PAGE 4: ACTIONS + KPIs
   let ah=''; let n2=0;
   gaps.forEach(({d,sc,gap})=>{
-    if(gap<0.4) return;
+    // eliminar esta línea completamente
     const acts=(ACTIONS[d.id]||[]).slice(0,3);
     acts.forEach((act,ai)=>{
       n2++;
@@ -836,7 +831,7 @@ function doPrint() {
             </div>`;
         });
 
-        pdfActions.innerHTML = pdfHTML;
+// pdfActions.innerHTML = pdfHTML;
         
         // FORZAR VISIBILIDAD: Asegura que el contenedor no esté oculto por CSS
         if(pdfP4) pdfP4.style.display = 'block';
