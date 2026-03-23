@@ -189,10 +189,12 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
   .pdf-kpi-val{font-size:8.5px;color:#2C2C2A;line-height:1.4}
   .pdf-footer{margin-top:6mm;padding-top:3mm;border-top:1px solid #e0d8cc;font-family:var(--mono);font-size:8px;color:#aaa;display:flex;justify-content:space-between}
 
-  /* HIDE SCREEN ELEMENTS IN PDF */
-#s2 .rgrid, #s2 .card-wide > .lbl, #s2 .card-wide > h2, #s2 .card-wide > div:last-child,
-#s2 #dscores, #s2 #rfecha,
-#s2 > .card-wide > div[style*="justify-content:space-between"]{display:none!important}
+/* HIDE SCREEN ELEMENTS IN PDF */
+  #s2 .rgrid,#s2 .card-wide > .lbl,#s2 .card-wide > h2,#s2 .card-wide > div:last-child,
+  #s2 #aplan, #s2 #dscores, #s2 #rfecha,
+  #s2 > .card-wide > div[style*="justify-content:space-between"]{display:none!important}
+  .pdf-cover,.pdf-s1,.pdf-s2,.pdf-s3{display:block}
+}
 
 /* Fuerza a que el contenedor del PDF sea visible */
 #pdf-p4, #pdf-actions { display: block !important; opacity: 1 !important; visibility: visible !important; }
@@ -777,21 +779,54 @@ function buildPDF(avg, mat, fecha, gaps){
 
 
 // ── PRINT CON PLAN DE ACCIÓN ──────────────────────────────────────────────────
-function doPrint(){
-  // 1. Capturamos el plan que ya calculó la web
-  const planWeb = document.getElementById('aplan');
-  const planPDF = document.getElementById('pdf-actions');
+function doPrint() {
+    const aplan = document.getElementById('aplan');
+    const pdfActions = document.getElementById('pdf-actions');
 
-  if (planWeb && planPDF) {
-    // 2. Lo clonamos al contenedor del PDF
-    planPDF.innerHTML = planWeb.innerHTML;
-  }
+    if (aplan && pdfActions) {
+        let pdfHTML = '';
+        // 1. Buscamos todas las acciones generadas en la web
+        const items = aplan.querySelectorAll('.ai');
 
-  // 3. Tiempo de espera de 1.2 segundos para que el navegador 
-  // 'dibuje' los cuadros antes de sacar el PDF
-  setTimeout(() => {
-    window.print();
-  }, 1200);
+        items.forEach((item) => {
+            // 2. Extraemos solo el texto limpio
+            const num = item.querySelector('.ap').innerText;
+            const title = item.querySelector('strong').innerText;
+            const dimText = item.querySelector('p').innerText;
+            
+            // Buscamos la prioridad para asignarle color
+            const prioSpan = item.querySelector('.at');
+            const prioText = prioSpan ? prioSpan.innerText : '';
+            
+            // 3. Asignamos el color nativo del PDF
+            let badgeClass = 'pdf-ai-low'; // Verde por defecto
+            if (prioText.includes('CRÍTICO') || prioText.includes('CRITICO')) {
+                badgeClass = 'pdf-ai-crit'; // Rojo
+            } else if (prioText.includes('MEDIO')) {
+                badgeClass = 'pdf-ai-med'; // Amarillo
+            }
+
+            // 4. Construimos la estructura exacta que tu PDF necesita
+            pdfHTML += `
+            <div class="pdf-action-item">
+                <div class="pdf-ai-header">
+                    <div class="pdf-ai-num ${badgeClass}">${num}</div>
+                    <div>
+                        <div class="pdf-ai-title">${title}</div>
+                        <div class="pdf-ai-dim" style="margin-top:2px;">${dimText} &middot; <strong>${prioText}</strong></div>
+                    </div>
+                </div>
+            </div>`;
+        });
+
+        // 5. Inyectamos el HTML perfecto en el contenedor del PDF
+        pdfActions.innerHTML = pdfHTML;
+    }
+
+    // 6. Lanzamos la impresión
+    setTimeout(() => {
+        window.print();
+    }, 500);
 }
 
 // ── ENVIO A GOOGLE SHEETS ─────────────────────────────────────────────────────
