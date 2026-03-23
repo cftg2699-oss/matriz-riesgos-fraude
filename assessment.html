@@ -190,11 +190,12 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
   .pdf-footer{margin-top:6mm;padding-top:3mm;border-top:1px solid #e0d8cc;font-family:var(--mono);font-size:8px;color:#aaa;display:flex;justify-content:space-between}
 
   /* HIDE SCREEN ELEMENTS IN PDF */
-  #s2 .rgrid,#s2 .card-wide > .lbl,#s2 .card-wide > h2,#s2 .card-wide > div:last-child,
-  #s2 #aplan, #s2 #dscores, #s2 #rfecha,
-  #s2 > .card-wide > div[style*="justify-content:space-between"]{display:none!important}
-  .pdf-cover,.pdf-s1,.pdf-s2,.pdf-s3{display:block}
-}
+#s2 .rgrid, #s2 .card-wide > .lbl, #s2 .card-wide > h2, #s2 .card-wide > div:last-child,
+#s2 #dscores, #s2 #rfecha,
+#s2 > .card-wide > div[style*="justify-content:space-between"]{display:none!important}
+
+/* Fuerza a que el contenedor del PDF sea visible */
+#pdf-p4, #pdf-actions { display: block !important; opacity: 1 !important; visibility: visible !important; }
 
 /* ── Screen - hide pdf sections ──────────────────────────────────────── */
 .pdf-cover,.pdf-s1,.pdf-s2,.pdf-s3{display:none}
@@ -777,21 +778,20 @@ function buildPDF(avg, mat, fecha, gaps){
 
 // ── PRINT CON PLAN DE ACCIÓN ──────────────────────────────────────────────────
 function doPrint(){
-  // 1. Buscamos el contenido del Plan de Acción que la web ya generó
-  const webPlan = document.getElementById('aplan');
-  const pdfPlanContainer = document.getElementById('pdf-actions');
+  // 1. Capturamos el plan que ya calculó la web
+  const planWeb = document.getElementById('aplan');
+  const planPDF = document.getElementById('pdf-actions');
 
-  if (webPlan && pdfPlanContainer) {
-    // 2. Copiamos exactamente lo que se ve en la web al contenedor del PDF
-    pdfPlanContainer.innerHTML = webPlan.innerHTML;
-  } else {
-    console.error("No se encontró el plan de acción para copiar al PDF");
+  if (planWeb && planPDF) {
+    // 2. Lo clonamos al contenedor del PDF
+    planPDF.innerHTML = planWeb.innerHTML;
   }
 
-  // 3. Esperamos un momento para que el navegador renderice el nuevo contenido
+  // 3. Tiempo de espera de 1.2 segundos para que el navegador 
+  // 'dibuje' los cuadros antes de sacar el PDF
   setTimeout(() => {
     window.print();
-  }, 1000); // Subimos a 1 segundo para asegurar que carguen los 24 puntos
+  }, 1200);
 }
 
 // ── ENVIO A GOOGLE SHEETS ─────────────────────────────────────────────────────
