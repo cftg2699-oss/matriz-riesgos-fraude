@@ -189,36 +189,30 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
   .pdf-kpi-val{font-size:8.5px;color:#2C2C2A;line-height:1.4}
   .pdf-footer{margin-top:6mm;padding-top:3mm;border-top:1px solid #e0d8cc;font-family:var(--mono);font-size:8px;color:#aaa;display:flex;justify-content:space-between}
 
-/* HIDE SCREEN ELEMENTS IN PDF */
-/* HIDE SCREEN ELEMENTS IN PDF */
-  #s2 .rgrid, 
-  #s2 .card-wide > .lbl, 
-  #s2 .card-wide > h2, 
-  #s2 .card-wide > div:last-child,
-  #s2 #dscores, 
-  #s2 #rfecha,
-  #s2 > .card-wide > div[style*="justify-content:space-between"] {
-    display: none !important;
-  }
+  /* OCULTAR ELEMENTOS DE PANTALLA — selectores explícitos sin last-child */
+  #s2 .rgrid                                      { display: none !important; }
+  #s2 .card-wide > .lbl                           { display: none !important; }
+  #s2 .card-wide > h2                             { display: none !important; }
+  #s2 #dscores                                    { display: none !important; }
+  #s2 #rfecha                                     { display: none !important; }
+  #s2 > .card-wide > div[style*="justify-content"]  { display: none !important; }
 
-  /* FORZAR VISIBILIDAD DE SECCIONES PDF */
-  .pdf-cover, .pdf-s1, .pdf-s2, .pdf-s3 {
+  /* FORZAR VISIBILIDAD — doble-id supera cualquier regla anterior (1,2,1) */
+  #s2 #pdf-p1, #s2 #pdf-p2, #s2 #pdf-p3, #s2 #pdf-p4 {
     display: block !important;
     opacity: 1 !important;
     visibility: visible !important;
   }
 
-  /* FORZAR SALTO DE PÁGINA PARA EL PLAN DE ACCIÓN */
-  #pdf-p4 {
-    page-break-before: always !important;
-    display: block !important;
-  }
+  /* Salto de página explícito para páginas PDF */
+  #s2 #pdf-p1 { page-break-after: always !important; }
+  #s2 #pdf-p2 { page-break-after: always !important; }
+  #s2 #pdf-p3 { page-break-after: always !important; }
+  #s2 #pdf-p4 { page-break-before: always !important; }
 
-  /* ELIMINAMOS EL BLOQUEO DE #aplan SOLO PARA EL PDF */
-  #pdf-actions {
-    display: block !important;
-    min-height: 100px;
-  }
+  #pdf-actions { display: block !important; min-height: 20px; }
+  #pdf-kpis-global { display: block !important; }
+
 } /* AQUÍ TERMINA EL @media print */
 
 /* ── Screen - hide pdf sections ──────────────────────────────────────── */
@@ -685,7 +679,7 @@ function buildPDF(avg, mat, fecha, gaps){
   document.getElementById('pdf-f3').textContent=fdate;
   document.getElementById('pdf-f4').textContent=fdate;
 
-  // Radar for PDF (light theme)
+  // Radar para PDF (tema claro, sin animación, timeout mayor para garantizar render)
   setTimeout(()=>{
     if(chart2) chart2.destroy();
     const ctx2=document.getElementById('rc2');
@@ -708,7 +702,7 @@ function buildPDF(avg, mat, fecha, gaps){
         }
       });
     }
-  },300);
+  },600);
 
   // Dim rows PDF
   let dr='';
@@ -797,50 +791,51 @@ function buildPDF(avg, mat, fecha, gaps){
 
 // ── PRINT CON PLAN DE ACCIÓN ──────────────────────────────────────────────────
 function doPrint() {
+  // 1. Forzar visibilidad de todas las páginas PDF con inline !important
+  ['pdf-p1','pdf-p2','pdf-p3','pdf-p4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.setProperty('display', 'block', 'important');
+  });
+
+  // 2. Verificar que pdf-actions tiene contenido (buildPDF ya lo llenó)
+  const pdfActions = document.getElementById('pdf-actions');
+  if (pdfActions && !pdfActions.innerHTML.trim()) {
+    // Fallback: construir desde el plan en pantalla si está vacío
     const aplan = document.getElementById('aplan');
-    const pdfActions = document.getElementById('pdf-actions');
-    const pdfP4 = document.getElementById('pdf-p4'); // Referencia a la página 4
-
-    if (aplan && pdfActions) {
-        let pdfHTML = '';
-        const items = aplan.querySelectorAll('.ai');
-
-        items.forEach((item) => {
-            const num = item.querySelector('.ap').innerText;
-            const title = item.querySelector('strong').innerText;
-            const dimText = item.querySelector('p').innerText;
-            const prioSpan = item.querySelector('.at');
-            const prioText = prioSpan ? prioSpan.innerText : '';
-            
-            let badgeClass = 'pdf-ai-low'; 
-            if (prioText.includes('CRÍTICO') || prioText.includes('CRITICO')) {
-                badgeClass = 'pdf-ai-crit'; 
-            } else if (prioText.includes('MEDIO')) {
-                badgeClass = 'pdf-ai-med'; 
-            }
-
-            pdfHTML += `
-            <div class="pdf-action-item">
-                <div class="pdf-ai-header">
-                    <div class="pdf-ai-num ${badgeClass}">${num}</div>
-                    <div>
-                        <div class="pdf-ai-title">${title}</div>
-                        <div class="pdf-ai-dim" style="margin-top:2px;">${dimText} &middot; <strong>${prioText}</strong></div>
-                    </div>
-                </div>
-            </div>`;
-        });
-
-// pdfActions.innerHTML = pdfHTML;
-        
-        // FORZAR VISIBILIDAD: Asegura que el contenedor no esté oculto por CSS
-        if(pdfP4) pdfP4.style.display = 'block';
+    if (aplan) {
+      let pdfHTML = '';
+      aplan.querySelectorAll('.ai').forEach((item, idx) => {
+        const title = item.querySelector('strong')?.innerText || '';
+        const dimText = item.querySelector('p')?.innerText || '';
+        const prioSpan = item.querySelector('.at');
+        const prioText = prioSpan ? prioSpan.innerText : '';
+        const badgeClass = prioText.includes('CRÍTICO') || prioText.includes('CRITICO') ? 'pdf-ai-crit'
+                         : prioText.includes('MEDIO') ? 'pdf-ai-med' : 'pdf-ai-low';
+        pdfHTML += `<div class="pdf-action-item">
+          <div class="pdf-ai-header">
+            <div class="pdf-ai-num ${badgeClass}">${idx+1}</div>
+            <div>
+              <div class="pdf-ai-title">${title}</div>
+              <div class="pdf-ai-dim">${dimText} · ${prioText}</div>
+            </div>
+          </div>
+        </div>`;
+      });
+      pdfActions.innerHTML = pdfHTML || pdfActions.innerHTML;
     }
+  }
 
-    // Aumentamos a 1000ms para que el navegador "dibuje" la página 5 antes de imprimir
-    setTimeout(() => {
-        window.print();
-    }, 1000);
+  // 3. Esperar a que el gráfico radar PDF (rc2) esté completamente renderizado
+  const waitAndPrint = () => {
+    const rc2 = document.getElementById('rc2');
+    const chartReady = rc2 && rc2.getContext && chart2 && chart2.data;
+    if (chartReady) {
+      setTimeout(() => window.print(), 300);
+    } else {
+      setTimeout(waitAndPrint, 200);
+    }
+  };
+  waitAndPrint();
 }
 
 // ── ENVIO A GOOGLE SHEETS ─────────────────────────────────────────────────────
