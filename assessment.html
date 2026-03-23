@@ -123,7 +123,6 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
 </head>
 <body>
 
-<!-- PANTALLA 0: REGISTRO -->
 <div id="s0" class="screen active">
 <div class="card">
   <div style="text-align:center;margin-bottom:2rem">
@@ -186,7 +185,6 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
 </div>
 </div>
 
-<!-- PANTALLA 1: CUESTIONARIO -->
 <div id="s1" class="screen">
   <div class="prog-wrap no-print">
     <div class="prog-info">
@@ -198,7 +196,6 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
   <div class="card" id="qcard"></div>
 </div>
 
-<!-- PANTALLA 2: RESULTADOS -->
 <div id="s2" class="screen">
 <div class="card card-wide">
   <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.4rem">
@@ -240,7 +237,6 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
 </div>
 </div>
 
-<!-- MODAL PRIVACIDAD -->
 <div class="modal-bg" id="modal-p">
 <div class="modal">
   <button class="modal-x" onclick="closeP()">&#x2715;</button>
@@ -271,10 +267,9 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
 
 <script>
 // ── CONFIGURACION ─────────────────────────────────────────────────────────
-// PASO 1: Reemplaza esta URL con la de tu Google Apps Script Web App
+// LINEA 249: REEMPLAZA ESTA URL CON TU URL DE APPS SCRIPT
 const SHEETS_URL = "TU_GOOGLE_APPS_SCRIPT_URL_AQUI";
 
-// ── DIMENSIONES Y PREGUNTAS ───────────────────────────────────────────────
 const DIMS = [
   { id:"gov", code:"01", name:"Gobierno y Cultura Antifraude",
     desc:"Compromiso directivo, cultura etica y estructura de supervision antifraude.",
@@ -351,10 +346,8 @@ const ACTIONS = {
   rsp:["Documentar y aprobar protocolo de respuesta ante incidentes de fraude","Capacitar al equipo de auditoria en tecnicas de investigacion de fraude","Establecer proceso formal de leciones aprendidas post-incidente con distribucion"]
 };
 
-// ── ESTADO ────────────────────────────────────────────────────────────────
 let U = {}, dim = 0, ans = [], scores = [], chart = null;
 
-// ── INICIO ────────────────────────────────────────────────────────────────
 function startA() {
   const nombre = g('fn').trim(), empresa = g('fe').trim(), email = g('fem').trim();
   const ok1 = nombre && empresa && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -378,7 +371,6 @@ function showS(n) {
   window.scrollTo(0,0);
 }
 
-// ── CUESTIONARIO ──────────────────────────────────────────────────────────
 function renderQ() {
   const d = DIMS[dim], a = ans[dim];
   const done = a.filter(x=>x!==null).length;
@@ -417,7 +409,6 @@ function setA(qi,v){ ans[dim][qi]=v; renderQ(); }
 function nextD(){ if(ans[dim].every(x=>x!==null)){dim++; renderQ(); window.scrollTo(0,0);} }
 function prevD(){ if(dim>0){dim--; renderQ(); window.scrollTo(0,0);} }
 
-// ── RESULTADOS ────────────────────────────────────────────────────────────
 function finish() {
   scores = DIMS.map((_,i) => ans[i].reduce((s,v)=>s+v,0)/ans[i].length);
   const avg = scores.reduce((s,v)=>s+v,0)/scores.length;
@@ -430,7 +421,6 @@ function finish() {
   document.getElementById('rtitle').textContent = `Nivel ${mat.lv} — ${mat.ti}`;
   document.getElementById('rdesc').textContent  = mat.de;
 
-  // Scores dim
   let dh = '';
   DIMS.forEach((d,i) => {
     const sc = scores[i], m2 = MAT.find(m=>sc>=m.mn&&sc<=m.mx)||MAT[4];
@@ -443,7 +433,6 @@ function finish() {
   });
   document.getElementById('dscores').innerHTML = dh;
 
-  // Radar
   if(chart) chart.destroy();
   chart = new Chart(document.getElementById('rc').getContext('2d'),{
     type:'radar',
@@ -462,7 +451,6 @@ function finish() {
     }
   });
 
-  // Plan accion
   const gaps = DIMS.map((d,i)=>({d,sc:scores[i],gap:4-scores[i]})).sort((a,b)=>b.gap-a.gap);
   let ph='', n=0;
   const priC = g2 => g2>=2?'p-a':g2>=1?'p-m':'p-b';
@@ -493,9 +481,13 @@ function finish() {
   sendData(avg, mat);
 }
 
-// ── ENVIO A GOOGLE SHEETS ─────────────────────────────────────────────────
 async function sendData(avg, mat) {
-  if(SHEETS_URL==="https://script.google.com/macros/s/AKfycbzOIDEgiVyjGQPuLTjhhN9-p7tVlXwrwIS4w_Py_IxvTrnHVDcnCIu3BjeM8wRs95v9/exec") return;
+  // Evitar error si no has configurado la URL real
+  if(SHEETS_URL.includes("TU_GOOGLE_APPS_SCRIPT_URL")) {
+    console.warn("No se ha configurado la URL de Apps Script.");
+    return;
+  }
+  
   const body = {
     timestamp: new Date().toISOString(),
     nombre:U.nombre, empresa:U.empresa, email:U.email,
@@ -506,10 +498,19 @@ async function sendData(avg, mat) {
     controles:scores[2].toFixed(2),  tecnologia:scores[3].toFixed(2),
     cumplimiento:scores[4].toFixed(2), respuesta:scores[5].toFixed(2)
   };
+
   try {
-    await fetch(SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    // CORRECCION: Se usa 'no-cors' para evitar bloqueos del navegador con Google Apps Script
+    await fetch(SHEETS_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
     showToast('Resultado registrado correctamente');
-  } catch(e) { console.warn('Sheets error:',e); }
+  } catch(e) { 
+    console.warn('Sheets error:',e); 
+  }
 }
 
 function openP(){ document.getElementById('modal-p').classList.add('open'); }
