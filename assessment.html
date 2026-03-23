@@ -775,26 +775,23 @@ function buildPDF(avg, mat, fecha, gaps){
 }
 
 
-// ── PRINT ─────────────────────────────────────────────────────────────────────
+// ── PRINT CON PLAN DE ACCIÓN ──────────────────────────────────────────────────
 function doPrint(){
-  // 1. Capturamos el plan de acción que ya se generó en la pantalla de resultados
-  const planHtml = document.getElementById('aplan').innerHTML;
-  
-  // 2. Lo inyectamos en el contenedor que el PDF usa en la página 4
-  const pdfContainer = document.getElementById('pdf-actions');
-  
-  if (pdfContainer) {
-    pdfContainer.innerHTML = planHtml;
+  // 1. Buscamos el contenido del Plan de Acción que la web ya generó
+  const webPlan = document.getElementById('aplan');
+  const pdfPlanContainer = document.getElementById('pdf-actions');
+
+  if (webPlan && pdfPlanContainer) {
+    // 2. Copiamos exactamente lo que se ve en la web al contenedor del PDF
+    pdfPlanContainer.innerHTML = webPlan.innerHTML;
+  } else {
+    console.error("No se encontró el plan de acción para copiar al PDF");
   }
 
-  // 3. Opcional: Si quieres que los KPIs también salgan con el estado que creamos
-  const kpisHtml = document.getElementById('pdf-kpis-global');
-  // (Aquí podrías añadir lógica similar si ves que los KPIs globales salen vacíos)
-
-  // 4. Lanzamos la impresión con un tiempo de espera para que el navegador procese el cambio
+  // 3. Esperamos un momento para que el navegador renderice el nuevo contenido
   setTimeout(() => {
     window.print();
-  }, 800);
+  }, 1000); // Subimos a 1 segundo para asegurar que carguen los 24 puntos
 }
 
 // ── ENVIO A GOOGLE SHEETS ─────────────────────────────────────────────────────
