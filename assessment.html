@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assessment de Madurez Antifraude · Control Interno</title>
-<meta name="description" content="Evalua el nivel de madurez de tu organizacion en control y prevencion del fraude. Diagnostico gratuito en 6 dimensiones.">
+<meta name="description" content="Evalúa el nivel de madurez de tu organización en control y prevención del fraude. Diagnóstico gratuito en 6 dimensiones.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -48,14 +48,6 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
 .btn-g:hover{color:var(--paper);border-color:rgba(247,244,238,.38)}
 .btn-full{width:100%;margin-top:1.4rem}
 .btn svg{width:15px;height:15px;flex-shrink:0}
-.prog-wrap{margin-bottom:1.8rem;width:100%;max-width:640px}
-.prog-info{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:.45rem}
-.prog-bar{height:3px;background:rgba(200,146,58,.13);border-radius:2px}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--amber-l));border-radius:2px;transition:width .4s ease}
-.dim-hdr{display:flex;align-items:center;gap:.7rem;margin-bottom:1.4rem;padding-bottom:.9rem;border-bottom:1px solid rgba(200,146,58,.13)}
-.dim-icon{width:36px;height:36px;border-radius:var(--r);border:1px solid rgba(200,146,58,.28);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--amber);flex-shrink:0}
-.dim-name{font-weight:500;font-size:.97rem}
-.dim-ct{font-size:.78rem;color:var(--muted);font-family:var(--mono)}
 .q-block{margin-bottom:1.4rem}
 .q-text{font-size:.88rem;color:rgba(247,244,238,.85);margin-bottom:.7rem;line-height:1.55}
 .scale{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem}
@@ -105,6 +97,17 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
 .dim-pill{padding:.45rem .6rem;border:1px solid rgba(200,146,58,.1);border-radius:var(--r);text-align:center;font-size:.7rem;color:rgba(247,244,238,.45);font-family:var(--mono)}
 .toast{position:fixed;bottom:2rem;right:2rem;background:rgba(46,107,79,.92);color:#E2EFDA;padding:.7rem 1.1rem;border-radius:var(--r);font-family:var(--mono);font-size:11px;z-index:300;transform:translateY(70px);opacity:0;transition:all .3s;border:1px solid rgba(46,107,79,.5)}
 .toast.show{transform:translateY(0);opacity:1}
+/* Estilos Barra de Progreso Avanzada */
+.stepper{display:flex;justify-content:space-between;width:100%;max-width:800px;margin:0 auto 2.5rem;position:relative}
+.stepper::before{content:'';position:absolute;top:15px;left:50px;right:50px;height:2px;background:rgba(200,146,58,.1);z-index:1}
+.step-item{flex:1;text-align:center;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center}
+.step-circle{width:32px;height:32px;border-radius:50%;background:var(--slate);border:2px solid rgba(200,146,58,.2);color:rgba(247,244,238,.4);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:500;transition:all .3s}
+.step-label{font-size:10px;color:rgba(247,244,238,.45);font-family:var(--mono);margin-top:.6rem;text-transform:uppercase;letter-spacing:.05em;transition:all .3s}
+.step-item.active .step-circle{background:var(--amber);color:var(--ink);border-color:var(--amber);box-shadow:0 0 15px rgba(200,146,58,.3)}
+.step-item.active .step-label{color:var(--amber);font-weight:500}
+.step-item.completed .step-circle{background:rgba(200,146,58,0.15);color:var(--amber);border-color:var(--amber)}
+.step-item.completed .step-label{color:rgba(247,244,238,.7)}
+
 @media print{
   body::before{display:none}
   .no-print{display:none!important}
@@ -118,6 +121,7 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
   .dims-prev{grid-template-columns:repeat(2,1fr)}
   .scale{grid-template-columns:repeat(2,1fr)}
   .card{padding:1.4rem}
+  .step-label{display:none}
 }
 </style>
 </head>
@@ -174,26 +178,60 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
   </div>
   <div class="chk-wrap">
     <input type="checkbox" id="ckp">
-    <span>He leído y acepto la <a href="#" onclick="openP();return false">Política de Privacidad</a>.</span>
+    <span>He leído y acepto la <a href="#" onclick="openP();return false">Política de Privacidad y Tratamiento de Datos</a>. Entiendo que mis datos serán usados para fines de análisis de resultados y comunicaciones sobre herramientas de auditoría, control interno y gestión de riesgos.</span>
   </div>
-  <div class="err" id="ep" style="margin-top:.4rem">Debes aceptar la politica de privacidad</div>
-  <button class="btn btn-p btn-full" onclick="startA()">INICIAR ASSESSMENT</button>
+  <div class="err" id="ep" style="margin-top:.4rem">Debes aceptar la política de privacidad</div>
+  <button class="btn btn-p btn-full" onclick="startA()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    INICIAR ASSESSMENT
+  </button>
+  <p style="text-align:center;font-size:.68rem;color:rgba(247,244,238,.22);margin-top:.6rem;font-family:var(--mono)">Sin spam · Datos protegidos · Resultados inmediatos</p>
 </div>
 </div>
 
 <div id="s1" class="screen">
-  <div class="prog-wrap no-print">
-    <div class="prog-info">
-      <span id="prog-lbl">Dimensión 1 de 6</span>
-      <span id="prog-pct">0%</span>
+  <div class="stepper no-print" id="stepper">
+    <div class="step-item active">
+      <div class="step-circle">01</div>
+      <div class="step-label">Gobierno</div>
     </div>
-    <div class="prog-bar"><div class="prog-fill" id="prog-f" style="width:0%"></div></div>
+    <div class="step-item">
+      <div class="step-circle">02</div>
+      <div class="step-label">Riesgos</div>
+    </div>
+    <div class="step-item">
+      <div class="step-circle">03</div>
+      <div class="step-label">Controles</div>
+    </div>
+    <div class="step-item">
+      <div class="step-circle">04</div>
+      <div class="step-label">Tecnología</div>
+    </div>
+    <div class="step-item">
+      <div class="step-circle">05</div>
+      <div class="step-label">Cumplimiento</div>
+    </div>
+    <div class="step-item">
+      <div class="step-circle">06</div>
+      <div class="step-label">Respuesta</div>
+    </div>
   </div>
+  
   <div class="card" id="qcard"></div>
 </div>
 
 <div id="s2" class="screen">
 <div class="card card-wide">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.4rem">
+    <div>
+      <div class="label">Resultados de tu Assessment</div>
+      <h2 id="res-hdr">Diagnóstico de Madurez Antifraude</h2>
+    </div>
+    <button class="btn btn-g no-print" onclick="window.print()" style="padding:.55rem 1.1rem;font-size:12px">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      IMPRIMIR / PDF
+    </button>
+  </div>
   <div class="res-grid">
     <div>
       <div class="mat-badge">
@@ -208,92 +246,330 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
       <div class="radar-wrap"><canvas id="rc"></canvas></div>
     </div>
   </div>
-  <div id="aplan"></div>
-  <button class="btn btn-p" onclick="window.print()">DESCARGAR REPORTE PDF</button>
+  <div style="margin-top:1.4rem">
+    <div class="ac-title">Plan de Acción Prioritario</div>
+    <div id="aplan"></div>
+  </div>
+  <div style="margin-top:1.8rem;padding-top:1.4rem;border-top:1px solid rgba(200,146,58,.1);display:flex;gap:.9rem;flex-wrap:wrap" class="no-print">
+    <button class="btn btn-p" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      DESCARGAR REPORTE PDF
+    </button>
+    <button class="btn btn-g" onclick="location.reload()">Nuevo assessment &rarr;</button>
+  </div>
+  <p style="font-size:.7rem;color:rgba(247,244,238,.18);margin-top:.8rem;font-family:var(--mono)" id="rfecha"></p>
 </div>
 </div>
 
 <div class="modal-bg" id="modal-p">
-<div class="modal"><button class="modal-x" onclick="closeP()">✕</button><h3>Privacidad</h3><p>Tus datos se usarán para el diagnóstico.</p></div>
+<div class="modal">
+  <button class="modal-x" onclick="closeP()">✕</button>
+  <h3>Política de Privacidad y Tratamiento de Datos</h3>
+  <p><strong>Responsable:</strong> Titular de esta herramienta de diagnóstico de madurez antifraude.</p>
+  <p><strong>Datos que recopilamos:</strong></p>
+  <ul>
+    <li>Nombre completo, empresa, correo electrónico</li>
+    <li>Teléfono y WhatsApp (opcional)</li>
+    <li>Cargo y sector (opcionales)</li>
+    <li>Resultados del assessment por dimensión y nivel de madurez</li>
+  </ul>
+  <p><strong>Finalidad:</strong> Los datos serán utilizados exclusivamente para:</p>
+  <ul>
+    <li>Enviarte los resultados de tu diagnóstico</li>
+    <li>Comunicaciones sobre herramientas de auditoría, control interno y gestión de riesgos</li>
+    <li>Identificación de necesidades de capacitación o consultoría</li>
+    <li>Análisis estadísticos agregados y anónimos del sector</li>
+  </ul>
+  <p><strong>Base legal:</strong> Consentimiento explícito al marcar la casilla de aceptación.</p>
+  <p><strong>Conservación:</strong> Los datos se conservarán mientras sean necesarios o hasta que el titular solicite su eliminación.</p>
+  <p><strong>Derechos:</strong> Puedes solicitar acceso, rectificación o eliminación de tus datos escribiendo al responsable. Nos comprometemos a NO compartir ni vender tus datos a terceros sin tu consentimiento expreso.</p>
+  <button class="btn btn-p" style="width:100%;margin-top:1rem" onclick="closeP()">ENTENDIDO, CERRAR</button>
+</div>
 </div>
 
-<div class="toast" id="toast">Resultado registrado correctamente</div>
+<div class="toast" id="toast">Datos guardados correctamente</div>
 
 <script>
 // ── CONFIGURACIÓN (Línea 249) ─────────────────────────────────────────────
 const SHEETS_URL = "https://script.google.com/macros/s/AKfycbwliXIxVxChMnLetWphUX1AjMiR6XR8lWo2ILYAIuCZ8yluD_tpOkHB8HpJwL0ucAn5/exec";
 
+// ── DIMENSIONES Y PREGUNTAS ───────────────────────────────────────────────
 const DIMS = [
-  { id:"gov", code:"01", name:"Gobierno Antifraude", desc:"Cultura y supervisión.", qs:["La organización cuenta con política antifraude formal.","Existe Comité de Riesgos.","El código de conducta cubre fraude.","Tono de la gerencia ético.","Existen canales de denuncia."] },
-  { id:"rsk", code:"02", name:"Gestión de Riesgos", desc:"Evaluación y metodología.", qs:["Evaluación formal anual.","Cubre procesos críticos.","Registro de riesgos actualizado.","Análisis de riesgos emergentes.","Priorización de recursos."] },
-  { id:"ctr", code:"03", name:"Controles Internos", desc:"Efectividad y monitoreo.", qs:["Controles preventivos específicos.","Segregación de funciones.","Pruebas de efectividad.","Controles detectivos regulares.","Actualización de controles."] },
-  { id:"tec", code:"04", name:"Tecnología", desc:"Analítica y herramientas.", qs:["Uso de análisis de datos.","Alertas automatizadas.","Logs de auditoría protegidos.","Control de acceso estricto.","Análisis masivos periódicos."] },
-  { id:"cmp", code:"05", name:"Cumplimiento", desc:"Normativa y estándares.", qs:["Conoce y cumple regulaciones.","Programa formal de Compliance.","Capacitaciones anuales.","Proceso de reporte legal.","Cláusulas en contratos."] },
-  { id:"rsp", code:"06", name:"Respuesta", desc:"Investigación y acción.", qs:["Protocolo de respuesta formal.","Personal capacitado.","Análisis causa raíz.","Coordinación legal/RRHH.","Lecciones aprendidas."] }
+  { id:"gov", code:"01", name:"Gobierno y Cultura Antifraude",
+    desc:"Compromiso directivo, cultura ética y estructura de supervisión antifraude.",
+    qs:[
+      "La organización cuenta con una política antifraude formalmente aprobada por la alta dirección.",
+      "Existe un Comité de Riesgos que supervisa activamente los riesgos de fraude.",
+      "El código de conducta cubre explícitamente el fraude y es comunicado periódicamente.",
+      "La alta dirección demuestra activamente el tono ético e integridad (tone at the top).",
+      "Existen canales formales y anónimos para reportar sospechas de fraude."
+    ]},
+  { id:"rsk", code:"02", name:"Gestión de Riesgos de Fraude",
+    desc:"Metodología y frecuencia de identificación, valoración y priorización de riesgos.",
+    qs:[
+      "Se realiza una evaluación formal de riesgos de fraude al menos una vez al año.",
+      "El proceso de evaluación cubre todos los procesos críticos y áreas de alto riesgo.",
+      "Los riesgos de fraude se documentan en un registro actualizado con responsables asignados.",
+      "Se utilizan herramientas analíticas para identificar riesgos emergentes de fraude.",
+      "Los resultados de la evaluación se usan para priorizar recursos de auditoría."
+    ]},
+  { id:"ctr", code:"03", name:"Controles Internos Antifraude",
+    desc:"Efectividad, cobertura y monitoreo de controles preventivos y detectivos.",
+    qs:[
+      "Existen controles preventivos específicos para los riesgos de fraude identificados.",
+      "Hay segregación de funciones adecuada en los procesos de mayor exposición al fraude.",
+      "Se realizan pruebas periódicas de efectividad de controles antifraude.",
+      "Los controles detectivos (conciliaciones, auditorías sorpresa, logs) se ejecutan con regularidad.",
+      "Existe un proceso formal para actualizar controles cuando se detectan nuevas amenazas."
+    ]},
+  { id:"tec", code:"04", name:"Tecnología y Analítica de Datos",
+    desc:"Uso de herramientas tecnológicas para prevención, detección y monitoreo del fraude.",
+    qs:[
+      "Se utilizan herramientas de análisis de datos para detectar anomalías y patrones de fraude.",
+      "Existen alertas automatizadas que notifican comportamientos transaccionales inusuales.",
+      "Los registros de auditoría (logs) son completos, protegidos y revisados en sistemas críticos.",
+      "Los sistemas de control de acceso aplican el principio de mínimo privilegio.",
+      "Se realizan análisis de datos masivos (data analytics) al menos trimestralmente."
+    ]},
+  { id:"cmp", code:"05", name:"Cumplimiento Regulatorio y Legal",
+    desc:"Alineamiento con normativas y estándares aplicables en materia antifraude.",
+    qs:[
+      "La organización conoce y cumple las regulaciones aplicables en prevención de fraude.",
+      "Existe un programa formal de cumplimiento (Compliance) con responsable designado.",
+      "Se realizan capacitaciones obligatorias sobre prevención de fraude al menos una vez al año.",
+      "Existe un proceso para reportar incidentes de fraude a las autoridades cuando corresponde.",
+      "Los contratos con proveedores incluyen cláusulas antifraude y anticorrupción."
+    ]},
+  { id:"rsp", code:"06", name:"Respuesta e Investigación de Fraude",
+    desc:"Capacidad para detectar, investigar y responder eficazmente ante incidentes.",
+    qs:[
+      "Existe un protocolo documentado de respuesta a incidentes de fraude con cadena de custodia.",
+      "La organización cuenta con personal capacitado para realizar investigaciones de fraude internas.",
+      "Los casos de fraude se documentan y analizan para identificar causas raíz.",
+      "Existe coordinación establecida con áreas legales, RRHH y dirección para gestión de incidentes.",
+      "Las lecciones aprendidas de incidentes pasados se comunican a la organización."
+    ]}
 ];
 
 const SCALE = [{n:1,l:"No existe"},{n:2,l:"En desarrollo"},{n:3,l:"Implementado"},{n:4,l:"Optimizado"}];
+
 const MAT = [
-  {mn:1.0,mx:1.49,lv:1,ti:"Inicial",de:"Reactivo.",co:"#C04A3F"},
-  {mn:1.5,mx:2.49,lv:2,ti:"Gestionado",de:"Procesos básicos.",co:"#D4781A"},
-  {mn:2.5,mx:3.24,lv:3,ti:"Definido",de:"Estandarizado.",co:"#BA7517"},
-  {mn:3.25,mx:3.74,lv:4,ti:"Medido",de:"Monitoreo activo.",co:"#5A9E72"},
-  {mn:3.75,mx:4.0,lv:5,ti:"Optimizado",de:"Mejora continua.",co:"#2E6B4F"}
+  {mn:1.0,mx:1.49,lv:1,ti:"Inicial",     de:"Sin estructura formal. Respuesta reactiva. Alta exposición no gestionada.", co:"#C04A3F"},
+  {mn:1.5,mx:2.49,lv:2,ti:"Gestionado",  de:"Procesos básicos definidos pero inconsistentes. Controles parciales.", co:"#D4781A"},
+  {mn:2.5,mx:3.24,lv:3,ti:"Definido",    de:"Marco antifraude estandarizado. Controles implementados con supervisión periódica.", co:"#BA7517"},
+  {mn:3.25,mx:3.74,lv:4,ti:"Medido",     de:"Métricas activas y monitoreo continuo. Analítica integrada en la gestión del riesgo.", co:"#5A9E72"},
+  {mn:3.75,mx:4.0,lv:5,ti:"Optimizado",  de:"Mejora continua. Cultura antifraude consolidada. Analítica predictiva y proactiva.", co:"#2E6B4F"},
 ];
 
-let U={}, dim=0, ans=[], scores=[], chart=null;
+const ACTIONS = {
+  gov:["Formalizar política antifraude aprobada por directorio con revisión anual","Implementar canal de denuncias anónimo con proveedor externo independiente","Incorporar riesgo de fraude en agenda del Comité de Riesgos trimestralmente"],
+  rsk:["Implementar evaluación anual de riesgos de fraude con metodología estructurada","Desarrollar registro de riesgos con propietarios y fechas de revisión actualizadas","Integrar analítica de datos en la identificación de riesgos emergentes"],
+  ctr:["Mapear y fortalecer controles preventivos en los 5 procesos de mayor riesgo","Implementar pruebas periódicas de efectividad con evidencia documentada","Revisar y corregir deficiencias de segregación de funciones en áreas críticas"],
+  tec:["Implementar alertas automatizadas para transacciones fuera de parámetros normales","Activar y centralizar logs de auditoría con retención adecuada en sistemas críticos","Ejecutar data analytics en ciclos trimestrales para detección de irregularidades"],
+  cmp:["Diseñar y ejecutar programa anual de capacitación en compliance y prevención de fraude","Designar un responsable formal de cumplimiento (Compliance Officer)","Revisar contratos con proveedores e incorporar cláusulas antifraude estándar"],
+  rsp:["Documentar y aprobar protocolo de respuesta ante incidentes de fraude","Capacitar al equipo de auditoría en técnicas de investigación de fraude","Establecer proceso formal de lecciones aprendidas post-incidente con distribución"]
+};
 
+// ── ESTADO ────────────────────────────────────────────────────────────────
+let U = {}, dim = 0, ans = [], scores = [], chart = null;
+
+// ── INICIO ────────────────────────────────────────────────────────────────
 function startA() {
-  const nombre=g('fn'), empresa=g('fe'), email=g('fem'), ckp=document.getElementById('ckp').checked;
-  if(!nombre || !empresa || !email || !ckp) { alert("Completa los campos obligatorios"); return; }
-  U={nombre,empresa,email,telefono:g('ft'),cargo:g('fc'),sector:g('fs')};
-  ans=DIMS.map(()=>Array(5).fill(null)); renderQ(); showS(1);
+  const nombre = g('fn').trim(), empresa = g('fe').trim(), email = g('fem').trim();
+  const ok1 = nombre && empresa && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const ckp  = document.getElementById('ckp').checked;
+  document.querySelectorAll('.err').forEach(e => e.style.display='none');
+  if (!nombre)  sh('en');
+  if (!empresa) sh('ee');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) sh('eem');
+  if (!ckp)     sh('ep');
+  if (!ok1 || !ckp) return;
+  U = { nombre, empresa, email, telefono:g('ft').trim(), cargo:g('fc').trim(), sector:g('fs').trim() };
+  dim = 0; ans = DIMS.map(() => Array(5).fill(null));
+  showS(1); renderQ();
 }
 
-function g(id){ return document.getElementById(id).value; }
-function showS(n){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('s'+n).classList.add('active'); }
+function g(id) { return document.getElementById(id).value; }
+function sh(id) { document.getElementById(id).style.display='block'; }
+function showS(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  window.scrollTo(0,0);
+}
 
+// ── CUESTIONARIO ──────────────────────────────────────────────────────────
 function renderQ() {
-  const d=DIMS[dim], a=ans[dim];
-  const pct=Math.round((dim/DIMS.length)*100);
-  document.getElementById('prog-f').style.width=pct+'%';
-  let h=`<h2>${d.name}</h2><p>${d.desc}</p>`;
-  d.qs.forEach((q,i)=>{
-    h+=`<div class="q-block"><p>${i+1}. ${q}</p><div class="scale">`;
-    SCALE.forEach(s=>{ h+=`<div class="sb ${a[i]===s.n?'sel':''}" onclick="setA(${i},${s.n})">${s.n}</div>`; });
-    h+=`</div></div>`;
+  const d = DIMS[dim], a = ans[dim];
+  const total = d.qs.length;
+  
+  // Actualizar Barra de Progreso Avanzada
+  updateStepper();
+
+  // Encabezado Dimensión
+  let h = `<div class="dim-hdr">
+    <div class="dim-icon">${d.code}</div>
+    <div><div class="dim-name">${d.name}</div><div class="dim-ct">${total} preguntas · Escala 1–4</div></div>
+  </div>
+  <p style="font-size:.8rem;color:var(--muted);margin-bottom:1.3rem;line-height:1.5">${d.desc}</p>`;
+
+  // Nueva LEYENDA DE ESCALA Fija Profesional
+  h += `<div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:2rem; padding:15px; background:rgba(200,146,58,0.05); border-radius:var(--r); border:1px solid rgba(200,146,58,0.1); box-shadow: inset 0 0 10px rgba(0,0,0,0.1)">
+    <div style="font-size:10px; color:var(--muted); text-align:center;"><strong style="color:var(--amber); display:block; font-size:12px; margin-bottom:2px">1. INICIAL</strong>Inexistente o ad-hoc</div>
+    <div style="font-size:10px; color:var(--muted); text-align:center;"><strong style="color:var(--amber); display:block; font-size:12px; margin-bottom:2px">2. EN DESARROLLO</strong>Informal o parcial</div>
+    <div style="font-size:10px; color:var(--muted); text-align:center;"><strong style="color:var(--amber); display:block; font-size:12px; margin-bottom:2px">3. IMPLEMENTADO</strong>Estandarizado y formal</div>
+    <div style="font-size:10px; color:var(--muted); text-align:center;"><strong style="color:var(--amber); display:block; font-size:12px; margin-bottom:2px">4. OPTIMIZADO</strong>Monitoreado y continuo</div>
+  </div>`;
+
+  // Render Preguntas
+  d.qs.forEach((q,i) => {
+    h += `<div class="q-block"><div class="q-text"><span style="font-family:var(--mono);font-size:.73rem;color:var(--amber);margin-right:.4rem">${i+1}.</span>${q}</div><div class="scale">`;
+    SCALE.forEach(s => {
+      h += `<div class="sb${a[i]===s.n?' sel':''}" onclick="setA(${i},${s.n})"><span class="sn">${s.n}</span><span class="sl">${s.l}</span></div>`;
+    });
+    h += `</div></div>`;
   });
-  h+=`<button class="btn btn-p" onclick="${dim===5?'finish()':'nextD()'}">${dim===5?'FINALIZAR':'SIGUIENTE'}</button>`;
-  document.getElementById('qcard').innerHTML=h;
+
+  // Navegación Corregida
+  const allDone = a.every(x=>x!==null);
+  const isLast  = dim === DIMS.length-1;
+  h += `<div class="q-nav">
+    <button class="btn btn-g" onclick="prevD()" ${dim===0?'disabled style="opacity:.3;cursor:not-allowed"':''}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;margin-right:6px"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      ANTERIOR
+    </button>
+    <button class="btn btn-p" id="btn-nx" onclick="${isLast?'finish()':'nextD()'}" ${!allDone?'disabled':''}>
+      ${isLast?'FINALIZAR Y VER REPORTE':'SIGUIENTE DIMENSIÓN'}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;margin-left:6px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>`;
+  document.getElementById('qcard').innerHTML = h;
+}
+
+function updateStepper() {
+  const steps = document.querySelectorAll('#stepper .step-item');
+  steps.forEach((step, i) => {
+    step.classList.remove('active', 'completed');
+    if (i === dim) {
+      step.classList.add('active');
+    } else if (i < dim) {
+      step.classList.add('completed');
+    }
+  });
 }
 
 function setA(qi,v){ ans[dim][qi]=v; renderQ(); }
-function nextD(){ dim++; renderQ(); }
+function nextD(){ if(ans[dim].every(x=>x!==null)){dim++; renderQ(); window.scrollTo(0,0);} }
+function prevD(){ if(dim>0){dim--; renderQ(); window.scrollTo(0,0);} }
 
+// ── RESULTADOS ────────────────────────────────────────────────────────────
 function finish() {
-  scores=ans.map(a=>a.reduce((s,v)=>s+v,0)/a.length);
-  const avg=scores.reduce((s,v)=>s+v,0)/scores.length;
-  const mat=MAT.find(m=>avg>=m.mn && avg<=m.mx)||MAT[0];
-  document.getElementById('rscore').textContent=avg.toFixed(1);
-  document.getElementById('rtitle').textContent=mat.ti;
-  showS(2); sendData(avg, mat);
+  scores = DIMS.map((_,i) => ans[i].reduce((s,v)=>s+v,0)/ans[i].length);
+  const avg = scores.reduce((s,v)=>s+v,0)/scores.length;
+  const mat = MAT.find(m => avg>=m.mn && avg<=m.mx) || MAT[4];
+
+  document.getElementById('res-hdr').textContent = `${U.nombre} · ${U.empresa}`;
+  document.getElementById('rfecha').textContent = `Evaluado el ${new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'})}`;
+  document.getElementById('rscore').textContent = avg.toFixed(1);
+  document.getElementById('rscore').style.color = mat.co;
+  document.getElementById('rtitle').textContent = `Nivel ${mat.lv} — ${mat.ti}`;
+  document.getElementById('rdesc').textContent  = mat.de;
+
+  let dh = '';
+  DIMS.forEach((d,i) => {
+    const sc = scores[i], m2 = MAT.find(m=>sc>=m.mn&&sc<=m.mx)||MAT[4];
+    dh += `<div class="dsr">
+      <div class="dot" style="background:${m2.co}"></div>
+      <div class="dsr-lbl">${d.name}</div>
+      <div class="dsr-bw"><div class="dsr-bar"><div class="dsr-fill" style="width:${(sc/4)*100}%;background:${m2.co}"></div></div></div>
+      <div class="dsr-val" style="color:${m2.co}">${sc.toFixed(1)}</div>
+    </div>`;
+  });
+  document.getElementById('dscores').innerHTML = dh;
+
+  if(chart) chart.destroy();
+  chart = new Chart(document.getElementById('rc').getContext('2d'),{
+    type:'radar',
+    data:{
+      labels: DIMS.map(d=>d.name.length>18?d.name.slice(0,16)+'..':d.name),
+      datasets:[
+        {label:'Tu organización',data:scores,backgroundColor:'rgba(200,146,58,.13)',borderColor:'rgba(200,146,58,.8)',pointBackgroundColor:'rgba(200,146,58,.9)',pointBorderColor:'transparent',borderWidth:2},
+        {label:'Nivel objetivo (4)',data:Array(6).fill(4),backgroundColor:'transparent',borderColor:'rgba(247,244,238,.08)',borderDash:[4,4],pointRadius:0,borderWidth:1}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:true,
+      scales:{r:{min:0,max:4,ticks:{stepSize:1,color:'rgba(247,244,238,.28)',backdropColor:'transparent',font:{size:8,family:"'DM Mono'"}},
+        grid:{color:'rgba(200,146,58,.1)'},pointLabels:{color:'rgba(247,244,238,.55)',font:{size:9.5,family:"'DM Sans'"}},angleLines:{color:'rgba(200,146,58,.1)'}}},
+      plugins:{legend:{labels:{color:'rgba(247,244,238,.45)',font:{size:10},boxWidth:9}},
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw.toFixed?c.raw.toFixed(1):c.raw}`}}}
+    }
+  });
+
+  const gaps = DIMS.map((d,i)=>({d,sc:scores[i],gap:4-scores[i]})).sort((a,b)=>b.gap-a.gap);
+  let ph='', n=0;
+  const priC = g2 => g2>=2?'p-a':g2>=1?'p-m':'p-b';
+  const priL = g2 => g2>=2?'CRÍTICO':g2>=1?'MEDIO':'BAJO';
+  const plazo = g2 => g2>=2?'0-30 días':g2>=1?'1-3 meses':'3-6 meses';
+  gaps.slice(0,4).forEach(({d,sc,gap})=>{
+    if(gap<0.5) return;
+    (ACTIONS[d.id]||[]).slice(0,2).forEach(act=>{
+      n++;
+      ph += `<div class="ai">
+        <div class="ap ${priC(gap)}">${n}</div>
+        <div>
+          <strong>${act}</strong>
+          <p>Dimensión: ${d.name} &middot; Score actual: ${sc.toFixed(1)}/4.0</p>
+          <div class="ai-meta">
+            <span class="at">${priL(gap)}</span>
+            <span class="at">${plazo(gap)}</span>
+            <span class="at">GAP: ${gap.toFixed(1)}</span>
+          </div>
+        </div>
+      </div>`;
+    });
+  });
+  if(!ph) ph=`<p style="color:var(--muted);font-size:.875rem">Excelente nivel de madurez. Continúa con el programa de mejora continua.</p>`;
+  document.getElementById('aplan').innerHTML = ph;
+
+  showS(2);
+  sendData(avg, mat);
 }
 
+// ── ENVÍO A GOOGLE SHEETS (Con no-cors corregido) ─────────────────────────
 async function sendData(avg, mat) {
-  const body={
-    timestamp:new Date().toISOString(), nombre:U.nombre, empresa:U.empresa, email:U.email,
-    nivel_madurez:mat.lv, score_general:avg.toFixed(2),
-    gobernanza:scores[0].toFixed(2), riesgos:scores[1].toFixed(2), controles:scores[2].toFixed(2),
-    tecnologia:scores[3].toFixed(2), cumplimiento:scores[4].toFixed(2), respuesta:scores[5].toFixed(2)
+  // Candado de seguridad (no aplica aquí porque ya pusiste tu URL real)
+  if(SHEETS_URL.includes("TU_GOOGLE_APPS_SCRIPT")) return;
+  
+  const body = {
+    timestamp: new Date().toISOString(),
+    nombre:U.nombre, empresa:U.empresa, email:U.email,
+    telefono:U.telefono, cargo:U.cargo, sector:U.sector,
+    nivel_madurez:mat.lv, titulo_madurez:mat.ti,
+    score_general:avg.toFixed(2),
+    gobernanza:scores[0].toFixed(2), gestion_riesgos:scores[1].toFixed(2),
+    controles:scores[2].toFixed(2),  tecnologia:scores[3].toFixed(2),
+    cumplimiento:scores[4].toFixed(2), respuesta:scores[5].toFixed(2)
   };
   try {
-    await fetch(SHEETS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(body)});
-    document.getElementById('toast').classList.add('show');
-  } catch(e){ console.error(e); }
+    // CORRECCIÓN PROFESIONAL: Usamos no-cors para evitar el error 400 en navegadores estrictos
+    await fetch(SHEETS_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    // Al usar no-cors, no podemos leer la respuesta, asumimos OK si no hay excepción
+    showToast('Resultado registrado correctamente');
+  } catch(e) { console.warn('Sheets error:',e); }
 }
 
 function openP(){ document.getElementById('modal-p').classList.add('open'); }
 function closeP(){ document.getElementById('modal-p').classList.remove('open'); }
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeP();});
 </script>
 </body>
 </html>
