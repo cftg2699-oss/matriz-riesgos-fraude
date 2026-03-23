@@ -3,455 +3,634 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Assessment de Madurez Antifraude · Control Interno</title>
-<meta name="description" content="Evalua el nivel de madurez de tu organizacion en control y prevencion del fraude. Diagnostico gratuito en 6 dimensiones.">
+<title>Assessment de Madurez Antifraude</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
+/* ── RESET & VARS ─────────────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --ink:#0B0F1A;--paper:#F7F4EE;--amber:#C8923A;--amber-l:#E8B870;
   --slate:#1C2539;--muted:#6B7180;--line:rgba(200,146,58,.15);
   --serif:'DM Serif Display',Georgia,serif;
-  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
-  --r:6px;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;--r:6px;
+  --c1:#C04A3F;--c2:#D4781A;--c3:#BA7517;--c4:#5A9E72;--c5:#2E6B4F;
 }
 html{scroll-behavior:smooth}
 body{background:var(--ink);color:var(--paper);font-family:var(--sans);font-size:16px;line-height:1.6;min-height:100vh}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:64px 64px;pointer-events:none;z-index:0}
+/* ── SCREENS ──────────────────────────────────────────────────────────── */
 .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:2rem 1.5rem}
 .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
 .card{background:rgba(28,37,57,.88);border:1px solid rgba(200,146,58,.2);border-radius:12px;padding:2.5rem;width:100%;max-width:640px;backdrop-filter:blur(8px)}
-.card-wide{max-width:880px}
-.label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--amber);text-transform:uppercase;margin-bottom:.5rem}
+.card-wide{max-width:900px}
+/* ── TYPE ─────────────────────────────────────────────────────────────── */
+.lbl{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--amber);text-transform:uppercase;margin-bottom:.4rem}
 h1{font-family:var(--serif);font-size:clamp(1.9rem,4vw,2.8rem);line-height:1.1;margin-bottom:.8rem}
 h1 em{font-style:italic;color:var(--amber)}
-h2{font-family:var(--serif);font-size:1.5rem;line-height:1.2;margin-bottom:.5rem}
+h2{font-family:var(--serif);font-size:1.5rem;line-height:1.2;margin-bottom:.4rem}
+h3{font-family:var(--serif);font-size:1.15rem;margin-bottom:.7rem}
 p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
-.form-group{margin-bottom:1.1rem}
-.form-group label{display:block;font-size:11px;letter-spacing:.06em;color:rgba(247,244,238,.55);margin-bottom:.35rem;font-family:var(--mono)}
-.form-group input{width:100%;background:rgba(11,15,26,.6);border:1px solid rgba(200,146,58,.22);border-radius:var(--r);padding:.72rem 1rem;color:var(--paper);font-family:var(--sans);font-size:.9rem;transition:border-color .2s,box-shadow .2s;outline:none}
-.form-group input:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(200,146,58,.1)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.chk-wrap{display:flex;align-items:flex-start;gap:.7rem;margin-top:1.1rem}
-.chk-wrap input[type=checkbox]{width:17px;height:17px;flex-shrink:0;margin-top:3px;accent-color:var(--amber);cursor:pointer}
-.chk-wrap span{font-size:.79rem;color:rgba(247,244,238,.45);line-height:1.55}
-.chk-wrap a{color:var(--amber);text-decoration:none}
-.chk-wrap a:hover{text-decoration:underline}
+/* ── FORM ─────────────────────────────────────────────────────────────── */
+.fg{margin-bottom:1.1rem}
+.fg label{display:block;font-size:11px;letter-spacing:.06em;color:rgba(247,244,238,.5);margin-bottom:.3rem;font-family:var(--mono)}
+.fg input{width:100%;background:rgba(11,15,26,.6);border:1px solid rgba(200,146,58,.22);border-radius:var(--r);padding:.72rem 1rem;color:var(--paper);font-family:var(--sans);font-size:.9rem;transition:border-color .2s;outline:none}
+.fg input:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(200,146,58,.1)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.chk{display:flex;align-items:flex-start;gap:.7rem;margin-top:1.1rem}
+.chk input[type=checkbox]{width:17px;height:17px;flex-shrink:0;margin-top:3px;accent-color:var(--amber);cursor:pointer}
+.chk span{font-size:.79rem;color:rgba(247,244,238,.45);line-height:1.55}
+.chk a{color:var(--amber);text-decoration:none}
 .err{font-size:.75rem;color:#F08070;margin-top:.3rem;display:none;font-family:var(--mono)}
+/* ── BUTTONS ──────────────────────────────────────────────────────────── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-family:var(--mono);font-size:13px;letter-spacing:.06em;padding:.85rem 2rem;border-radius:var(--r);border:none;cursor:pointer;transition:all .2s;text-decoration:none}
-.btn-p{background:var(--amber);color:var(--ink);font-weight:500;box-shadow:0 4px 20px rgba(200,146,58,.2)}
-.btn-p:hover{background:var(--amber-l);transform:translateY(-1px);box-shadow:0 6px 28px rgba(200,146,58,.28)}
-.btn-p:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.btn-g{background:transparent;color:rgba(247,244,238,.6);border:1px solid rgba(247,244,238,.18)}
-.btn-g:hover{color:var(--paper);border-color:rgba(247,244,238,.38)}
-.btn-full{width:100%;margin-top:1.4rem}
+.bp{background:var(--amber);color:var(--ink);font-weight:500;box-shadow:0 4px 20px rgba(200,146,58,.2)}
+.bp:hover{background:var(--amber-l);transform:translateY(-1px)}
+.bp:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.bg{background:transparent;color:rgba(247,244,238,.6);border:1px solid rgba(247,244,238,.18)}
+.bg:hover{color:var(--paper);border-color:rgba(247,244,238,.38)}
+.bfull{width:100%;margin-top:1.4rem}
 .btn svg{width:15px;height:15px;flex-shrink:0}
-.prog-wrap{margin-bottom:1.8rem;width:100%;max-width:640px}
-.prog-info{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:.45rem}
-.prog-bar{height:3px;background:rgba(200,146,58,.13);border-radius:2px}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--amber-l));border-radius:2px;transition:width .4s ease}
-.dim-hdr{display:flex;align-items:center;gap:.7rem;margin-bottom:1.4rem;padding-bottom:.9rem;border-bottom:1px solid rgba(200,146,58,.13)}
-.dim-icon{width:36px;height:36px;border-radius:var(--r);border:1px solid rgba(200,146,58,.28);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--amber);flex-shrink:0}
-.dim-name{font-weight:500;font-size:.97rem}
-.dim-ct{font-size:.78rem;color:var(--muted);font-family:var(--mono)}
-.q-block{margin-bottom:1.4rem}
-.q-text{font-size:.88rem;color:rgba(247,244,238,.85);margin-bottom:.7rem;line-height:1.55}
-.scale{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem}
-.sb{background:rgba(11,15,26,.5);border:1px solid rgba(200,146,58,.13);border-radius:var(--r);padding:.55rem .3rem;text-align:center;cursor:pointer;transition:all .17s}
+/* ── PROGRESS ─────────────────────────────────────────────────────────── */
+.pw{margin-bottom:1.8rem;width:100%;max-width:640px}
+.pi{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:.45rem}
+.pb{height:3px;background:rgba(200,146,58,.12);border-radius:2px}
+.pf{height:100%;background:linear-gradient(90deg,var(--amber),var(--amber-l));border-radius:2px;transition:width .4s ease}
+/* ── QUESTIONS ────────────────────────────────────────────────────────── */
+.dh{display:flex;align-items:center;gap:.7rem;margin-bottom:1.4rem;padding-bottom:.9rem;border-bottom:1px solid rgba(200,146,58,.13)}
+.di{width:36px;height:36px;border-radius:var(--r);border:1px solid rgba(200,146,58,.28);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--amber);flex-shrink:0}
+.dn{font-weight:500;font-size:.97rem}
+.dc{font-size:.78rem;color:var(--muted);font-family:var(--mono)}
+.qb{margin-bottom:1.3rem}
+.qt{font-size:.875rem;color:rgba(247,244,238,.85);margin-bottom:.65rem;line-height:1.55}
+.sc{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}
+.sb{background:rgba(11,15,26,.5);border:1px solid rgba(200,146,58,.12);border-radius:var(--r);padding:.5rem .3rem;text-align:center;cursor:pointer;transition:all .16s}
 .sb:hover{border-color:rgba(200,146,58,.38);background:rgba(28,37,57,.8)}
-.sb.sel{background:rgba(200,146,58,.16);border-color:var(--amber)}
+.sb.sel{background:rgba(200,146,58,.15);border-color:var(--amber)}
 .sb .sn{display:block;font-family:var(--mono);font-size:1.05rem;font-weight:500;color:var(--amber)}
-.sb .sl{display:block;font-size:.63rem;color:var(--muted);margin-top:.12rem;line-height:1.3}
-.sb.sel .sl{color:rgba(200,146,58,.65)}
-.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.4rem;padding-top:.9rem;border-top:1px solid rgba(200,146,58,.1)}
-.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin:1.4rem 0}
-.mat-badge{text-align:center;padding:1.8rem 1rem;border:1px solid rgba(200,146,58,.22);border-radius:var(--r);background:rgba(11,15,26,.5);margin-bottom:.9rem}
-.mat-n{font-family:var(--serif);font-size:3.8rem;line-height:1}
-.mat-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:rgba(247,244,238,.4);margin-top:.25rem}
-.mat-title{font-family:var(--serif);font-size:1.15rem;margin-top:.4rem}
-.mat-desc{font-size:.78rem;color:var(--muted);margin-top:.25rem;line-height:1.5}
-.radar-wrap{border:1px solid rgba(200,146,58,.13);border-radius:var(--r);padding:.9rem;background:rgba(11,15,26,.4)}
-.dsr{display:flex;align-items:center;gap:.65rem;padding:.55rem 0;border-bottom:1px solid rgba(200,146,58,.07)}
+.sb .sl{display:block;font-size:.62rem;color:var(--muted);margin-top:.1rem;line-height:1.3}
+.sb.sel .sl{color:rgba(200,146,58,.6)}
+.qnav{display:flex;justify-content:space-between;align-items:center;margin-top:1.3rem;padding-top:.9rem;border-top:1px solid rgba(200,146,58,.1)}
+/* ── RESULTS SCREEN ───────────────────────────────────────────────────── */
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin:1.3rem 0}
+.mb{text-align:center;padding:1.6rem 1rem;border:1px solid rgba(200,146,58,.2);border-radius:var(--r);background:rgba(11,15,26,.5);margin-bottom:.9rem}
+.mn{font-family:var(--serif);font-size:3.8rem;line-height:1}
+.ml{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:rgba(247,244,238,.4);margin-top:.2rem}
+.mt{font-family:var(--serif);font-size:1.1rem;margin-top:.4rem}
+.md{font-size:.77rem;color:var(--muted);margin-top:.22rem;line-height:1.5}
+.rw{border:1px solid rgba(200,146,58,.12);border-radius:var(--r);padding:.85rem;background:rgba(11,15,26,.4)}
+.dsr{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid rgba(200,146,58,.07)}
 .dsr:last-child{border-bottom:none}
-.dsr-lbl{font-size:.78rem;color:rgba(247,244,238,.65);flex:1;line-height:1.3}
-.dsr-bw{width:90px;flex-shrink:0}
-.dsr-bar{height:5px;border-radius:3px;background:rgba(200,146,58,.1)}
-.dsr-fill{height:100%;border-radius:3px;transition:width .6s}
-.dsr-val{font-family:var(--mono);font-size:.73rem;min-width:26px;text-align:right;flex-shrink:0}
+.dsrl{font-size:.77rem;color:rgba(247,244,238,.65);flex:1;line-height:1.3}
+.dsrb{width:80px;flex-shrink:0}
+.dsrbar{height:5px;border-radius:3px;background:rgba(200,146,58,.1)}
+.dsrf{height:100%;border-radius:3px;transition:width .6s}
+.dsrv{font-family:var(--mono);font-size:.72rem;min-width:26px;text-align:right;flex-shrink:0}
 .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.ac-title{font-family:var(--serif);font-size:1.1rem;margin-bottom:.9rem}
-.ai{display:flex;gap:.65rem;padding:.85rem .9rem;border:1px solid rgba(200,146,58,.1);border-radius:var(--r);background:rgba(11,15,26,.4);margin-bottom:.55rem}
+/* ── ACTION ITEMS ─────────────────────────────────────────────────────── */
+.ai{display:flex;gap:.65rem;padding:.8rem .85rem;border:1px solid rgba(200,146,58,.1);border-radius:var(--r);background:rgba(11,15,26,.4);margin-bottom:.5rem}
 .ap{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.68rem;font-weight:500;flex-shrink:0;margin-top:1px}
-.p-a{background:rgba(192,74,63,.18);color:#F08070;border:1px solid rgba(192,74,63,.28)}
-.p-m{background:rgba(184,146,10,.18);color:#EBC84A;border:1px solid rgba(184,146,10,.28)}
-.p-b{background:rgba(46,107,79,.18);color:#6FC898;border:1px solid rgba(46,107,79,.28)}
-.ai strong{font-size:.85rem;display:block;margin-bottom:.18rem}
-.ai p{font-size:.76rem;color:var(--muted);line-height:1.4}
-.ai-meta{display:flex;gap:.4rem;margin-top:.35rem;flex-wrap:wrap}
-.at{font-family:var(--mono);font-size:.63rem;padding:.12rem .45rem;border-radius:20px;background:rgba(200,146,58,.09);color:rgba(200,146,58,.65);letter-spacing:.05em}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(11,15,26,.93);z-index:200;align-items:center;justify-content:center;padding:1.5rem}
-.modal-bg.open{display:flex}
+.pa{background:rgba(192,74,63,.18);color:#F08070;border:1px solid rgba(192,74,63,.28)}
+.pm{background:rgba(184,146,10,.18);color:#EBC84A;border:1px solid rgba(184,146,10,.28)}
+.pb2{background:rgba(46,107,79,.18);color:#6FC898;border:1px solid rgba(46,107,79,.28)}
+.ai strong{font-size:.84rem;display:block;margin-bottom:.15rem}
+.ai p{font-size:.75rem;color:var(--muted);line-height:1.4}
+.aimeta{display:flex;gap:.35rem;margin-top:.3rem;flex-wrap:wrap}
+.at{font-family:var(--mono);font-size:.62rem;padding:.1rem .42rem;border-radius:20px;background:rgba(200,146,58,.09);color:rgba(200,146,58,.62);letter-spacing:.05em}
+/* ── MODAL ────────────────────────────────────────────────────────────── */
+.mbg{display:none;position:fixed;inset:0;background:rgba(11,15,26,.93);z-index:200;align-items:center;justify-content:center;padding:1.5rem}
+.mbg.open{display:flex}
 .modal{background:var(--slate);border:1px solid rgba(200,146,58,.18);border-radius:12px;max-width:540px;width:100%;max-height:80vh;overflow-y:auto;padding:2rem}
-.modal h3{font-family:var(--serif);font-size:1.25rem;margin-bottom:.9rem}
-.modal p,.modal li{font-size:.8rem;color:rgba(247,244,238,.6);line-height:1.65;margin-bottom:.55rem}
-.modal ul{padding-left:1.1rem}
-.modal-x{float:right;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem}
-.hero-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--amber);border:1px solid rgba(200,146,58,.28);padding:.22rem .7rem;border-radius:20px;margin-bottom:1.1rem}
-.hero-badge span{width:5px;height:5px;border-radius:50%;background:var(--amber);animation:pulse 2s infinite}
+.modal h3{font-family:var(--serif);font-size:1.2rem;margin-bottom:.8rem}
+.modal p,.modal li{font-size:.79rem;color:rgba(247,244,238,.6);line-height:1.65;margin-bottom:.5rem}
+.modal ul{padding-left:1rem}
+.mx{float:right;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem}
+/* ── HERO ─────────────────────────────────────────────────────────────── */
+.hb{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--amber);border:1px solid rgba(200,146,58,.28);padding:.22rem .7rem;border-radius:20px;margin-bottom:1.1rem}
+.hb span{width:5px;height:5px;border-radius:50%;background:var(--amber);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.dims-prev{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:1.4rem}
-.dim-pill{padding:.45rem .6rem;border:1px solid rgba(200,146,58,.1);border-radius:var(--r);text-align:center;font-size:.7rem;color:rgba(247,244,238,.45);font-family:var(--mono)}
+.dp{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin-top:1.3rem}
+.dpill{padding:.4rem .55rem;border:1px solid rgba(200,146,58,.1);border-radius:var(--r);text-align:center;font-size:.69rem;color:rgba(247,244,238,.4);font-family:var(--mono)}
 .toast{position:fixed;bottom:2rem;right:2rem;background:rgba(46,107,79,.92);color:#E2EFDA;padding:.7rem 1.1rem;border-radius:var(--r);font-family:var(--mono);font-size:11px;z-index:300;transform:translateY(70px);opacity:0;transition:all .3s;border:1px solid rgba(46,107,79,.5)}
 .toast.show{transform:translateY(0);opacity:1}
+
+/* ════════════════════════════════════════════════════════════════════════
+   PDF / PRINT STYLES  — Reporte completo de 4 páginas
+════════════════════════════════════════════════════════════════════════ */
 @media print{
-  body::before{display:none}
-  .no-print{display:none!important}
-  .screen{display:block!important;min-height:auto;padding:.5rem}
-  .card,.card-wide{box-shadow:none;border-color:#ddd;background:#fff;color:#000}
-  .mat-n,.mat-title{color:#000!important}
+  @page{size:A4;margin:18mm 16mm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body{background:#fff!important;color:#0B0F1A!important}
+  body::before{display:none!important}
+  .no-print,.screen:not(#s2){display:none!important}
+  #s2{display:block!important;min-height:auto;padding:0;background:#fff}
+  .card-wide{max-width:100%;border:none;background:#fff;padding:0;backdrop-filter:none}
+
+  /* PORTADA PDF */
+  .pdf-cover{display:block!important;page-break-after:always}
+  .pdf-cover-bg{background:#0B0F1A;padding:32mm 16mm;text-align:center;border-radius:4px}
+  .pdf-cover-badge{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:#C8923A;border:1px solid rgba(200,146,58,.4);padding:.2rem .8rem;border-radius:20px;margin-bottom:12mm}
+  .pdf-cover h1{font-family:var(--serif);font-size:28px;color:#F7F4EE;line-height:1.15;margin-bottom:6mm}
+  .pdf-cover h1 span{color:#C8923A;font-style:italic}
+  .pdf-cover-sub{font-size:11px;color:rgba(247,244,238,.55);margin-bottom:10mm}
+  .pdf-cover-score-wrap{display:inline-flex;flex-direction:column;align-items:center;background:rgba(200,146,58,.1);border:1px solid rgba(200,146,58,.3);border-radius:8px;padding:8mm 14mm;margin:6mm 0}
+  .pdf-cover-n{font-family:var(--serif);font-size:52px;line-height:1}
+  .pdf-cover-title{font-family:var(--serif);font-size:18px;margin-top:2mm}
+  .pdf-cover-desc{font-size:10px;color:rgba(247,244,238,.5);margin-top:2mm;max-width:180px;line-height:1.5}
+  .pdf-cover-meta{margin-top:8mm;font-family:var(--mono);font-size:9px;color:rgba(247,244,238,.35);letter-spacing:.08em}
+  .pdf-cover-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm;margin-top:8mm}
+  .pdf-cv-item{border:1px solid rgba(200,146,58,.2);border-radius:4px;padding:3mm 4mm;text-align:left}
+  .pdf-cv-lbl{font-family:var(--mono);font-size:8px;color:rgba(200,146,58,.6);letter-spacing:.08em;margin-bottom:1mm}
+  .pdf-cv-val{font-size:10px;color:#F7F4EE;font-weight:500}
+
+  /* SECCIÓN 1: RADAR + SCORES */
+  .pdf-s1{display:block!important;page-break-after:always;padding-top:6mm}
+  .pdf-s1-grid{display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin-top:4mm}
+  .pdf-section-title{font-family:var(--serif);font-size:15px;color:#0B0F1A;border-left:3px solid #C8923A;padding-left:4mm;margin-bottom:4mm}
+  .pdf-radar-box{border:1px solid #e0d8cc;border-radius:4px;padding:4mm;background:#faf8f4}
+  .pdf-radar-box canvas{max-height:180px}
+  .pdf-dim-row{display:flex;align-items:center;gap:3mm;padding:2.5mm 0;border-bottom:1px solid #ede8e0}
+  .pdf-dim-row:last-child{border-bottom:none}
+  .pdf-dim-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .pdf-dim-name{font-size:9px;color:#2C2C2A;flex:1;line-height:1.3}
+  .pdf-dim-barwrap{width:70px;flex-shrink:0}
+  .pdf-dim-bar{height:6px;border-radius:3px;background:#ede8e0}
+  .pdf-dim-fill{height:100%;border-radius:3px}
+  .pdf-dim-score{font-family:var(--mono);font-size:9px;min-width:24px;text-align:right;font-weight:500}
+  .pdf-dim-level{font-size:8px;min-width:52px;text-align:right;padding:.1rem .35rem;border-radius:20px;font-family:var(--mono)}
+
+  /* SECCIÓN 2: DETALLE PREGUNTAS */
+  .pdf-s2{display:block!important;page-break-after:always;padding-top:6mm}
+  .pdf-qdim{margin-bottom:6mm;break-inside:avoid}
+  .pdf-qdim-title{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#C8923A;border-bottom:1px solid #e0d8cc;padding-bottom:2mm;margin-bottom:3mm;text-transform:uppercase}
+  .pdf-qrow{display:flex;align-items:flex-start;gap:3mm;padding:1.5mm 0;border-bottom:1px dotted #ede8e0}
+  .pdf-qrow:last-child{border-bottom:none}
+  .pdf-qnum{font-family:var(--mono);font-size:8px;color:#C8923A;flex-shrink:0;min-width:16px;margin-top:1px}
+  .pdf-qtext{font-size:8.5px;color:#3d3d3a;flex:1;line-height:1.4}
+  .pdf-qscore{font-family:var(--mono);font-size:9px;font-weight:500;min-width:32px;text-align:right}
+  .pdf-qbar{width:40px;flex-shrink:0;margin-top:4px}
+  .pdf-qbarinner{height:4px;border-radius:2px;background:#ede8e0}
+  .pdf-qbarfill{height:100%;border-radius:2px}
+
+  /* SECCIÓN 3: PLAN DE ACCIÓN + KPIs */
+  .pdf-s3{display:block!important;padding-top:6mm}
+  .pdf-action-item{border:1px solid #e0d8cc;border-radius:4px;padding:3.5mm;margin-bottom:3mm;break-inside:avoid}
+  .pdf-ai-header{display:flex;align-items:flex-start;gap:3mm;margin-bottom:2mm}
+  .pdf-ai-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:8px;font-weight:500;flex-shrink:0}
+  .pdf-ai-crit{background:#FFC7CE;color:#9C0006;border:1px solid #F09595}
+  .pdf-ai-med{background:#FFEB9C;color:#9C5700;border:1px solid #FAC775}
+  .pdf-ai-low{background:#C6EFCE;color:#276221;border:1px solid #9FC99F}
+  .pdf-ai-title{font-size:9.5px;font-weight:500;color:#0B0F1A;flex:1;line-height:1.35}
+  .pdf-ai-dim{font-size:8px;color:#888;font-family:var(--mono)}
+  .pdf-kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:2.5mm;margin-top:2mm}
+  .pdf-kpi{background:#faf8f4;border:1px solid #e0d8cc;border-radius:3px;padding:2.5mm;break-inside:avoid}
+  .pdf-kpi-lbl{font-family:var(--mono);font-size:7.5px;color:#C8923A;letter-spacing:.07em;margin-bottom:.5mm;text-transform:uppercase}
+  .pdf-kpi-val{font-size:8.5px;color:#2C2C2A;line-height:1.4}
+  .pdf-footer{margin-top:6mm;padding-top:3mm;border-top:1px solid #e0d8cc;font-family:var(--mono);font-size:8px;color:#aaa;display:flex;justify-content:space-between}
+
+  /* HIDE SCREEN ELEMENTS IN PDF */
+  #s2 .rgrid,#s2 .card-wide > .lbl,#s2 .card-wide > h2,#s2 .card-wide > div:last-child,
+  #s2 #aplan, #s2 #dscores, #s2 #rfecha,
+  #s2 > .card-wide > div[style*="justify-content:space-between"]{display:none!important}
+  .pdf-cover,.pdf-s1,.pdf-s2,.pdf-s3{display:block}
 }
+
+/* ── Screen - hide pdf sections ──────────────────────────────────────── */
+.pdf-cover,.pdf-s1,.pdf-s2,.pdf-s3{display:none}
+
+/* ── RESPONSIVE ───────────────────────────────────────────────────────── */
 @media(max-width:620px){
-  .res-grid{grid-template-columns:1fr}
-  .form-row{grid-template-columns:1fr}
-  .dims-prev{grid-template-columns:repeat(2,1fr)}
-  .scale{grid-template-columns:repeat(2,1fr)}
+  .rgrid{grid-template-columns:1fr}
+  .fr{grid-template-columns:1fr}
+  .dp{grid-template-columns:repeat(2,1fr)}
+  .sc{grid-template-columns:repeat(2,1fr)}
   .card{padding:1.4rem}
 }
 </style>
 </head>
 <body>
 
-<!-- PANTALLA 0: REGISTRO -->
+<!-- ══ PANTALLA 0: REGISTRO ══════════════════════════════════════════════ -->
 <div id="s0" class="screen active">
 <div class="card">
   <div style="text-align:center;margin-bottom:2rem">
-    <div class="hero-badge"><span></span>ASSESSMENT GRATUITO · ~10 MIN</div>
-    <div class="label">Modelo de Madurez Antifraude</div>
+    <div class="hb"><span></span>ASSESSMENT GRATUITO · ~10 MIN</div>
+    <div class="lbl">Modelo de Madurez Antifraude</div>
     <h1>Que tan preparada esta tu organizacion frente al <em>fraude</em>?</h1>
-    <p class="sub">Diagnostico en 6 dimensiones clave. Obtiene tu nivel de madurez, mapa de brechas y plan de accion priorizado.</p>
-    <div class="dims-prev">
-      <div class="dim-pill">01 Gobierno</div>
-      <div class="dim-pill">02 Riesgos</div>
-      <div class="dim-pill">03 Controles</div>
-      <div class="dim-pill">04 Tecnologia</div>
-      <div class="dim-pill">05 Cumplimiento</div>
-      <div class="dim-pill">06 Respuesta</div>
+    <p class="sub">Diagnostico en 6 dimensiones. Obtiene tu nivel de madurez, mapa de brechas y plan de accion priorizado.</p>
+    <div class="dp">
+      <div class="dpill">01 Gobierno</div><div class="dpill">02 Riesgos</div>
+      <div class="dpill">03 Controles</div><div class="dpill">04 Tecnologia</div>
+      <div class="dpill">05 Cumplimiento</div><div class="dpill">06 Respuesta</div>
     </div>
   </div>
-  <div class="form-row">
-    <div class="form-group">
-      <label>NOMBRE COMPLETO *</label>
+  <div class="fr">
+    <div class="fg"><label>NOMBRE COMPLETO *</label>
       <input type="text" id="fn" placeholder="Ana Garcia" autocomplete="name">
-      <div class="err" id="en">Campo requerido</div>
-    </div>
-    <div class="form-group">
-      <label>EMPRESA / ORGANIZACION *</label>
+      <div class="err" id="en">Campo requerido</div></div>
+    <div class="fg"><label>EMPRESA / ORGANIZACION *</label>
       <input type="text" id="fe" placeholder="Banco Nacional" autocomplete="organization">
-      <div class="err" id="ee">Campo requerido</div>
-    </div>
+      <div class="err" id="ee">Campo requerido</div></div>
   </div>
-  <div class="form-row">
-    <div class="form-group">
-      <label>CORREO ELECTRONICO *</label>
+  <div class="fr">
+    <div class="fg"><label>CORREO ELECTRONICO *</label>
       <input type="email" id="fem" placeholder="tu@empresa.com" autocomplete="email">
-      <div class="err" id="eem">Ingresa un correo valido</div>
-    </div>
-    <div class="form-group">
-      <label>TELEFONO / WHATSAPP</label>
-      <input type="tel" id="ft" placeholder="+593 99 000 0000" autocomplete="tel">
-    </div>
+      <div class="err" id="eem">Ingresa un correo valido</div></div>
+    <div class="fg"><label>TELEFONO / WHATSAPP</label>
+      <input type="tel" id="ft" placeholder="+593 99 000 0000" autocomplete="tel"></div>
   </div>
-  <div class="form-row">
-    <div class="form-group">
-      <label>CARGO / ROL</label>
-      <input type="text" id="fc" placeholder="Gerente de Auditoria">
-    </div>
-    <div class="form-group">
-      <label>SECTOR / INDUSTRIA</label>
-      <input type="text" id="fs" placeholder="Financiero, Retail, Gobierno...">
-    </div>
+  <div class="fr">
+    <div class="fg"><label>CARGO / ROL</label>
+      <input type="text" id="fc" placeholder="Gerente de Auditoria"></div>
+    <div class="fg"><label>SECTOR / INDUSTRIA</label>
+      <input type="text" id="fs" placeholder="Financiero, Retail, Gobierno..."></div>
   </div>
-  <div class="chk-wrap">
+  <div class="chk">
     <input type="checkbox" id="ckp">
-    <span>He leido y acepto la <a href="#" onclick="openP();return false">Politica de Privacidad y Tratamiento de Datos</a>. Entiendo que mis datos seran usados para fines de analisis de resultados y comunicaciones sobre herramientas de auditoria, control interno y gestion de riesgos.</span>
+    <span>He leido y acepto la <a href="#" onclick="openP();return false">Politica de Privacidad y Tratamiento de Datos</a>. Mis datos se usaran para analisis de resultados y comunicaciones sobre auditoria y gestion de riesgos.</span>
   </div>
   <div class="err" id="ep" style="margin-top:.4rem">Debes aceptar la politica de privacidad</div>
-  <button class="btn btn-p btn-full" onclick="startA()">
+  <button class="btn bp bfull" onclick="startA()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
     INICIAR ASSESSMENT
   </button>
-  <p style="text-align:center;font-size:.68rem;color:rgba(247,244,238,.22);margin-top:.6rem;font-family:var(--mono)">Sin spam · Datos protegidos · Resultados inmediatos</p>
+  <p style="text-align:center;font-size:.68rem;color:rgba(247,244,238,.2);margin-top:.6rem;font-family:var(--mono)">Sin spam · Datos protegidos · Resultados inmediatos</p>
 </div>
 </div>
 
-<!-- PANTALLA 1: CUESTIONARIO -->
+<!-- ══ PANTALLA 1: CUESTIONARIO ══════════════════════════════════════════ -->
 <div id="s1" class="screen">
-  <div class="prog-wrap no-print">
-    <div class="prog-info">
-      <span id="prog-lbl">Dimension 1 de 6</span>
-      <span id="prog-pct">0%</span>
-    </div>
-    <div class="prog-bar"><div class="prog-fill" id="prog-f" style="width:0%"></div></div>
+  <div class="pw no-print">
+    <div class="pi"><span id="plbl">Dimension 1 de 6</span><span id="ppct">0%</span></div>
+    <div class="pb"><div class="pf" id="pf" style="width:0%"></div></div>
   </div>
   <div class="card" id="qcard"></div>
 </div>
 
-<!-- PANTALLA 2: RESULTADOS -->
+<!-- ══ PANTALLA 2: RESULTADOS + PDF ══════════════════════════════════════ -->
 <div id="s2" class="screen">
 <div class="card card-wide">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.4rem">
+
+  <!-- HEADER SCREEN -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.4rem" class="no-print">
     <div>
-      <div class="label">Resultados de tu Assessment</div>
+      <div class="lbl">Resultados del Assessment</div>
       <h2 id="res-hdr">Diagnostico de Madurez Antifraude</h2>
     </div>
-    <button class="btn btn-g no-print" onclick="window.print()" style="padding:.55rem 1.1rem;font-size:12px">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-      IMPRIMIR / PDF
+    <button class="btn bg no-print" onclick="doPrint()" style="padding:.55rem 1.1rem;font-size:12px">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      DESCARGAR REPORTE PDF
     </button>
   </div>
-  <div class="res-grid">
+
+  <!-- SCREEN RESULTS -->
+  <div class="rgrid no-print">
     <div>
-      <div class="mat-badge">
-        <div class="mat-n" id="rscore">-</div>
-        <div class="mat-lbl">NIVEL DE MADUREZ</div>
-        <div class="mat-title" id="rtitle">-</div>
-        <div class="mat-desc" id="rdesc">-</div>
+      <div class="mb">
+        <div class="mn" id="rscore">-</div>
+        <div class="ml">NIVEL DE MADUREZ / 4.0</div>
+        <div class="mt" id="rtitle">-</div>
+        <div class="md" id="rdesc">-</div>
       </div>
       <div id="dscores"></div>
     </div>
     <div>
-      <div class="radar-wrap"><canvas id="rc"></canvas></div>
+      <div class="rw"><canvas id="rc"></canvas></div>
     </div>
   </div>
-  <div style="margin-top:1.4rem">
-    <div class="ac-title">Plan de Accion Prioritario</div>
+
+  <div style="margin-top:1.3rem" class="no-print">
+    <h3>Plan de Accion Prioritario</h3>
     <div id="aplan"></div>
   </div>
-  <div style="margin-top:1.8rem;padding-top:1.4rem;border-top:1px solid rgba(200,146,58,.1);display:flex;gap:.9rem;flex-wrap:wrap" class="no-print">
-    <button class="btn btn-p" onclick="window.print()">
+
+  <div style="margin-top:1.6rem;padding-top:1.2rem;border-top:1px solid rgba(200,146,58,.1);display:flex;gap:.8rem;flex-wrap:wrap" class="no-print">
+    <button class="btn bp" onclick="doPrint()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      DESCARGAR REPORTE PDF
+      DESCARGAR REPORTE COMPLETO PDF
     </button>
-    <button class="btn btn-g" onclick="location.reload()">Nuevo assessment &rarr;</button>
+    <button class="btn bg" onclick="location.reload()">Nuevo assessment &rarr;</button>
   </div>
-  <p style="font-size:.7rem;color:rgba(247,244,238,.18);margin-top:.8rem;font-family:var(--mono)" id="rfecha"></p>
-</div>
-</div>
+  <p style="font-size:.7rem;color:rgba(247,244,238,.18);margin-top:.6rem;font-family:var(--mono)" id="rfecha"></p>
+
+  <!-- ════ PDF PAGES (ocultas en pantalla, visibles al imprimir) ══════ -->
+
+  <!-- PDF PAGE 1: PORTADA -->
+  <div class="pdf-cover" id="pdf-p1">
+    <div class="pdf-cover-bg">
+      <div class="pdf-cover-badge">ASSESSMENT DE MADUREZ ANTIFRAUDE · REPORTE CONFIDENCIAL</div>
+      <h1>Diagnostico de Madurez en <span>Control Antifraude</span></h1>
+      <div class="pdf-cover-sub">Evaluacion basada en 6 dimensiones · 30 criterios · Modelo de madurez 1–4</div>
+      <div class="pdf-cover-score-wrap">
+        <div class="pdf-cover-n" id="pc-score">-</div>
+        <div class="pdf-cover-title" id="pc-title">-</div>
+        <div class="pdf-cover-desc" id="pc-desc">-</div>
+      </div>
+      <div class="pdf-cover-grid" id="pc-meta"></div>
+      <div class="pdf-cover-meta" id="pc-fecha">-</div>
+    </div>
+  </div>
+
+  <!-- PDF PAGE 2: RADAR + SCORES -->
+  <div class="pdf-s1" id="pdf-p2">
+    <div class="pdf-section-title">Resultados por Dimension</div>
+    <div class="pdf-s1-grid">
+      <div>
+        <div class="pdf-radar-box"><canvas id="rc2" style="max-height:220px"></canvas></div>
+      </div>
+      <div id="pdf-dim-rows"></div>
+    </div>
+    <div style="margin-top:6mm">
+      <div class="pdf-section-title">Interpretacion del Nivel de Madurez</div>
+      <table style="width:100%;border-collapse:collapse;font-size:8.5px">
+        <tr style="background:#1A2B4A;color:#fff">
+          <td style="padding:2mm 3mm;font-family:var(--mono);font-size:8px">NIVEL</td>
+          <td style="padding:2mm 3mm;font-family:var(--mono);font-size:8px">TITULO</td>
+          <td style="padding:2mm 3mm;font-family:var(--mono);font-size:8px">DESCRIPCION</td>
+          <td style="padding:2mm 3mm;font-family:var(--mono);font-size:8px">ACCION GENERAL</td>
+        </tr>
+        <tr style="background:#FFC7CE"><td style="padding:2mm 3mm;font-weight:500">1</td><td style="padding:2mm 3mm">Inicial</td><td style="padding:2mm 3mm">Sin estructura. Reaccion ad-hoc.</td><td style="padding:2mm 3mm">Programa integral urgente</td></tr>
+        <tr style="background:#FCBF75"><td style="padding:2mm 3mm;font-weight:500">2</td><td style="padding:2mm 3mm">Gestionado</td><td style="padding:2mm 3mm">Procesos basicos, inconsistentes.</td><td style="padding:2mm 3mm">Estandarizar y documentar</td></tr>
+        <tr style="background:#FFEB9C"><td style="padding:2mm 3mm;font-weight:500">3</td><td style="padding:2mm 3mm">Definido</td><td style="padding:2mm 3mm">Marco estandarizado y documentado.</td><td style="padding:2mm 3mm">Medir efectividad y brechas</td></tr>
+        <tr style="background:#C6EFCE"><td style="padding:2mm 3mm;font-weight:500">4</td><td style="padding:2mm 3mm">Medido</td><td style="padding:2mm 3mm">Metricas activas, monitoreo continuo.</td><td style="padding:2mm 3mm">Optimizar y automatizar</td></tr>
+        <tr style="background:#9FC99F"><td style="padding:2mm 3mm;font-weight:500">5</td><td style="padding:2mm 3mm">Optimizado</td><td style="padding:2mm 3mm">Cultura consolidada, analitica predictiva.</td><td style="padding:2mm 3mm">Mejora continua e innovacion</td></tr>
+      </table>
+    </div>
+    <div class="pdf-footer"><span>Assessment de Madurez Antifraude — Pagina 2 de 4</span><span id="pdf-f2"></span></div>
+  </div>
+
+  <!-- PDF PAGE 3: DETALLE PREGUNTAS -->
+  <div class="pdf-s2" id="pdf-p3">
+    <div class="pdf-section-title">Detalle de Respuestas por Dimension y Criterio</div>
+    <div id="pdf-qdetail"></div>
+    <div class="pdf-footer"><span>Assessment de Madurez Antifraude — Pagina 3 de 4</span><span id="pdf-f3"></span></div>
+  </div>
+
+  <!-- PDF PAGE 4: PLAN DE ACCION + KPIs -->
+  <div class="pdf-s3" id="pdf-p4">
+    <div class="pdf-section-title">Plan de Accion Prioritario con KPIs</div>
+    <div id="pdf-actions"></div>
+    <div style="margin-top:6mm">
+      <div class="pdf-section-title">KPIs de Seguimiento Recomendados por Dimension</div>
+      <div id="pdf-kpis-global"></div>
+    </div>
+    <div class="pdf-footer"><span>Assessment de Madurez Antifraude — Pagina 4 de 4</span><span id="pdf-f4"></span></div>
+  </div>
+
+</div><!-- end card-wide -->
+</div><!-- end s2 -->
 
 <!-- MODAL PRIVACIDAD -->
-<div class="modal-bg" id="modal-p">
+<div class="mbg" id="modal-p">
 <div class="modal">
-  <button class="modal-x" onclick="closeP()">&#x2715;</button>
+  <button class="mx" onclick="closeP()">&#x2715;</button>
   <h3>Politica de Privacidad y Tratamiento de Datos</h3>
   <p><strong>Responsable:</strong> Titular de esta herramienta de diagnostico de madurez antifraude.</p>
   <p><strong>Datos que recopilamos:</strong></p>
-  <ul>
-    <li>Nombre completo, empresa, correo electronico</li>
-    <li>Telefono y WhatsApp (opcional)</li>
-    <li>Cargo y sector (opcionales)</li>
-    <li>Resultados del assessment por dimension y nivel de madurez</li>
-  </ul>
-  <p><strong>Finalidad:</strong> Los datos seran utilizados exclusivamente para:</p>
-  <ul>
-    <li>Enviarte los resultados de tu diagnostico</li>
-    <li>Comunicaciones sobre herramientas de auditoria, control interno y gestion de riesgos</li>
-    <li>Identificacion de necesidades de capacitacion o consultoria</li>
-    <li>Analisis estadisticos agregados y anonimos del sector</li>
-  </ul>
-  <p><strong>Base legal:</strong> Consentimiento explicito al marcar la casilla de aceptacion.</p>
-  <p><strong>Conservacion:</strong> Los datos se conservaran mientras sean necesarios o hasta que el titular solicite su eliminacion.</p>
-  <p><strong>Derechos:</strong> Puedes solicitar acceso, rectificacion o eliminacion de tus datos escribiendo al responsable. Nos comprometemos a NO compartir ni vender tus datos a terceros sin tu consentimiento expreso.</p>
-  <button class="btn btn-p" style="width:100%;margin-top:1rem" onclick="closeP()">ENTENDIDO, CERRAR</button>
+  <ul><li>Nombre, empresa, correo, telefono, cargo, sector</li>
+  <li>Resultados por dimension e item, nivel de madurez, plan de accion generado</li></ul>
+  <p><strong>Finalidad:</strong> Envio de resultados, comunicaciones sobre auditoria y gestion de riesgos, identificacion de necesidades de capacitacion o consultoria, analisis estadisticos anonimos.</p>
+  <p><strong>Base legal:</strong> Consentimiento explicito al marcar la casilla. <strong>No se vendera ni compartira tu informacion con terceros</strong> sin tu consentimiento expreso.</p>
+  <p><strong>Derechos:</strong> Puedes solicitar acceso, rectificacion o eliminacion escribiendo al responsable.</p>
+  <button class="btn bp" style="width:100%;margin-top:1rem" onclick="closeP()">ENTENDIDO, CERRAR</button>
 </div>
 </div>
 
-<div class="toast" id="toast">Datos guardados correctamente</div>
+<div class="toast" id="toast">Datos registrados correctamente</div>
 
 <script>
-// ── CONFIGURACION ─────────────────────────────────────────────────────────
-// PASO 1: Reemplaza esta URL con la de tu Google Apps Script Web App
+// ── CONFIG ─────────────────────────────────────────────────────────────────
 const SHEETS_URL = "https://script.google.com/macros/s/AKfycbwliXIxVxChMnLetWphUX1AjMiR6XR8lWo2ILYAIuCZ8yluD_tpOkHB8HpJwL0ucAn5/exec";
 
-// ── DIMENSIONES Y PREGUNTAS ───────────────────────────────────────────────
+// ── DIMENSIONES ────────────────────────────────────────────────────────────
 const DIMS = [
   { id:"gov", code:"01", name:"Gobierno y Cultura Antifraude",
-    desc:"Compromiso directivo, cultura etica y estructura de supervision antifraude.",
+    desc:"Compromiso directivo, cultura etica y estructura de supervision.",
     qs:[
-      "La organizacion cuenta con una politica antifraude formalmente aprobada por la alta direccion.",
+      "La organizacion cuenta con una politica antifraude aprobada por la alta direccion.",
       "Existe un Comite de Riesgos que supervisa activamente los riesgos de fraude.",
-      "El codigo de conducta cubre explicitamente el fraude y es comunicado periodicamente.",
+      "El codigo de conducta cubre el fraude y es comunicado periodicamente a todos.",
       "La alta direccion demuestra activamente el tono etico e integridad (tone at the top).",
-      "Existen canales formales y anonimos para reportar sospechas de fraude."
+      "Existen canales anonimos y seguros para reportar sospechas de fraude."
+    ],
+    kpis:[
+      {k:"% empleados capacitados en politica antifraude",meta:"≥ 90% anual"},
+      {k:"Numero de denuncias recibidas por canal anonimo",meta:"Monitoreo trimestral"},
+      {k:"Frecuencia de revision de politica antifraude",meta:"≥ 1 vez/año"},
+      {k:"% de incidentes escalados al Comite de Riesgos",meta:"100% de casos graves"}
     ]},
   { id:"rsk", code:"02", name:"Gestion de Riesgos de Fraude",
-    desc:"Metodologia y frecuencia de identificacion, valoracion y priorizacion de riesgos.",
+    desc:"Metodologia de identificacion, valoracion y priorizacion de riesgos.",
     qs:[
-      "Se realiza una evaluacion formal de riesgos de fraude al menos una vez al ano.",
-      "El proceso de evaluacion cubre todos los procesos criticos y areas de alto riesgo.",
-      "Los riesgos de fraude se documentan en un registro actualizado con responsables asignados.",
-      "Se utilizan herramientas analiticas para identificar riesgos emergentes de fraude.",
-      "Los resultados de la evaluacion se usan para priorizar recursos de auditoria."
+      "Se realiza una evaluacion formal de riesgos de fraude al menos una vez al año.",
+      "El proceso cubre todos los procesos criticos y areas de alto riesgo.",
+      "Los riesgos se documentan en un registro actualizado con responsables asignados.",
+      "Se usan herramientas analiticas para identificar riesgos emergentes de fraude.",
+      "Los resultados se usan para priorizar recursos de auditoria interna."
+    ],
+    kpis:[
+      {k:"Numero de riesgos de fraude identificados y documentados",meta:"Actualizacion anual"},
+      {k:"% de riesgos criticos con plan de mitigacion activo",meta:"100%"},
+      {k:"Tiempo promedio entre identificacion y mitigacion de riesgo",meta:"≤ 30 dias"},
+      {k:"% de procesos cubiertos en la evaluacion de riesgos",meta:"≥ 80% de procesos criticos"}
     ]},
   { id:"ctr", code:"03", name:"Controles Internos Antifraude",
     desc:"Efectividad, cobertura y monitoreo de controles preventivos y detectivos.",
     qs:[
       "Existen controles preventivos especificos para los riesgos de fraude identificados.",
-      "Hay segregacion de funciones adecuada en los procesos de mayor exposicion al fraude.",
+      "Hay segregacion de funciones adecuada en procesos de mayor exposicion.",
       "Se realizan pruebas periodicas de efectividad de controles antifraude.",
       "Los controles detectivos (conciliaciones, auditorias sorpresa, logs) se ejecutan con regularidad.",
-      "Existe un proceso formal para actualizar controles cuando se detectan nuevas amenazas."
+      "Existe un proceso para actualizar controles ante nuevas amenazas detectadas."
+    ],
+    kpis:[
+      {k:"% de controles clave probados en el periodo",meta:"≥ 85% anual"},
+      {k:"Numero de deficiencias de control identificadas",meta:"Reduccion interanual"},
+      {k:"Tiempo promedio de remediacion de deficiencias criticas",meta:"≤ 15 dias"},
+      {k:"% de procesos con segregacion de funciones validada",meta:"100% procesos criticos"}
     ]},
   { id:"tec", code:"04", name:"Tecnologia y Analitica de Datos",
-    desc:"Uso de herramientas tecnologicas para prevencion, deteccion y monitoreo del fraude.",
+    desc:"Uso de herramientas tecnologicas para prevencion, deteccion y monitoreo.",
     qs:[
-      "Se utilizan herramientas de analisis de datos para detectar anomalias y patrones de fraude.",
-      "Existen alertas automatizadas que notifican comportamientos transaccionales inusuales.",
-      "Los registros de auditoria (logs) son completos, protegidos y revisados en sistemas criticos.",
-      "Los sistemas de control de acceso aplican el principio de minimo privilegio.",
-      "Se realizan analisis de datos masivos (data analytics) al menos trimestralmente."
+      "Se usan herramientas de analisis de datos para detectar anomalias y patrones de fraude.",
+      "Existen alertas automatizadas para comportamientos transaccionales inusuales.",
+      "Los registros de auditoria (logs) son completos, protegidos y revisados periodicamente.",
+      "Los sistemas aplican el principio de minimo privilegio en control de accesos.",
+      "Se ejecutan analisis de datos masivos (data analytics) al menos trimestralmente."
+    ],
+    kpis:[
+      {k:"Numero de alertas automatizadas generadas por periodo",meta:"Revision mensual de tendencia"},
+      {k:"% de alertas investigadas dentro del SLA definido",meta:"≥ 95% en 48h"},
+      {k:"Tasa de falsos positivos en el sistema de alertas",meta:"≤ 15%"},
+      {k:"Cobertura de logs activos en sistemas criticos",meta:"100% de sistemas criticos"}
     ]},
   { id:"cmp", code:"05", name:"Cumplimiento Regulatorio y Legal",
     desc:"Alineamiento con normativas y estandares aplicables en materia antifraude.",
     qs:[
       "La organizacion conoce y cumple las regulaciones aplicables en prevencion de fraude.",
-      "Existe un programa formal de cumplimiento (Compliance) con responsable designado.",
-      "Se realizan capacitaciones obligatorias sobre prevencion de fraude al menos una vez al ano.",
-      "Existe un proceso para reportar incidentes de fraude a las autoridades cuando corresponde.",
+      "Existe un programa formal de Compliance con responsable designado.",
+      "Se realizan capacitaciones obligatorias en prevencion de fraude al menos una vez al año.",
+      "Existe proceso para reportar incidentes de fraude a las autoridades cuando corresponde.",
       "Los contratos con proveedores incluyen clausulas antifraude y anticorrupcion."
+    ],
+    kpis:[
+      {k:"Numero de hallazgos regulatorios por periodo",meta:"Reduccion interanual"},
+      {k:"% contratos con proveedores criticos con clausulas antifraude",meta:"100%"},
+      {k:"% empleados con capacitacion en compliance completada",meta:"≥ 90% anual"},
+      {k:"Tiempo de respuesta ante requerimientos regulatorios",meta:"≤ plazo normativo"}
     ]},
   { id:"rsp", code:"06", name:"Respuesta e Investigacion de Fraude",
-    desc:"Capacidad para detectar, investigar y responder eficazmente ante incidentes.",
+    desc:"Capacidad para detectar, investigar y responder ante incidentes.",
     qs:[
-      "Existe un protocolo documentado de respuesta a incidentes de fraude con cadena de custodia.",
-      "La organizacion cuenta con personal capacitado para realizar investigaciones de fraude internas.",
+      "Existe un protocolo documentado de respuesta a incidentes con cadena de custodia.",
+      "La organizacion tiene personal capacitado para investigaciones internas de fraude.",
       "Los casos de fraude se documentan y analizan para identificar causas raiz.",
-      "Existe coordinacion establecida con areas legales, RRHH y direccion para gestion de incidentes.",
-      "Las lecciones aprendidas de incidentes pasados se comunican a la organizacion."
+      "Existe coordinacion formal con areas legales, RRHH y direccion para incidentes.",
+      "Las lecciones aprendidas de incidentes se comunican a la organizacion."
+    ],
+    kpis:[
+      {k:"Tiempo promedio de deteccion de un incidente de fraude",meta:"Reduccion interanual"},
+      {k:"Tiempo promedio de investigacion y cierre de casos",meta:"≤ 45 dias"},
+      {k:"% de casos con recuperacion de activos",meta:"Monitoreo semestral"},
+      {k:"Numero de mejoras implementadas por lecciones aprendidas",meta:"≥ 2 por incidente"}
     ]}
 ];
 
 const SCALE = [{n:1,l:"No existe"},{n:2,l:"En desarrollo"},{n:3,l:"Implementado"},{n:4,l:"Optimizado"}];
-
 const MAT = [
-  {mn:1.0,mx:1.49,lv:1,ti:"Inicial",     de:"Sin estructura formal. Respuesta reactiva. Alta exposicion no gestionada.", co:"#C04A3F"},
-  {mn:1.5,mx:2.49,lv:2,ti:"Gestionado",  de:"Procesos basicos definidos pero inconsistentes. Controles parciales.", co:"#D4781A"},
-  {mn:2.5,mx:3.24,lv:3,ti:"Definido",    de:"Marco antifraude estandarizado. Controles implementados con supervision periodica.", co:"#BA7517"},
-  {mn:3.25,mx:3.74,lv:4,ti:"Medido",     de:"Metricas activas y monitoreo continuo. Analitica integrada en la gestion del riesgo.", co:"#5A9E72"},
-  {mn:3.75,mx:4.0,lv:5,ti:"Optimizado",  de:"Mejora continua. Cultura antifraude consolidada. Analitica predictiva y proactiva.", co:"#2E6B4F"},
+  {mn:1.0,mx:1.49,lv:1,ti:"Inicial",     de:"Sin estructura formal. Exposicion critica no gestionada.",co:"#C04A3F",bg:"#FFC7CE"},
+  {mn:1.5,mx:2.49,lv:2,ti:"Gestionado",  de:"Procesos basicos definidos pero inconsistentes.",         co:"#D4781A",bg:"#FCBF75"},
+  {mn:2.5,mx:3.24,lv:3,ti:"Definido",    de:"Marco estandarizado. Controles implementados.",            co:"#BA7517",bg:"#FFEB9C"},
+  {mn:3.25,mx:3.74,lv:4,ti:"Medido",     de:"Metricas activas y monitoreo continuo con analitica.",     co:"#5A9E72",bg:"#C6EFCE"},
+  {mn:3.75,mx:4.0,lv:5,ti:"Optimizado",  de:"Cultura antifraude consolidada. Analitica predictiva.",    co:"#2E6B4F",bg:"#9FC99F"},
 ];
-
 const ACTIONS = {
-  gov:["Formalizar politica antifraude aprobada por directorio con revision anual","Implementar canal de denuncias anonimo con proveedor externo independiente","Incorporar riesgo de fraude en agenda del Comite de Riesgos trimestralmente"],
-  rsk:["Implementar evaluacion anual de riesgos de fraude con metodologia estructurada","Desarrollar registro de riesgos con propietarios y fechas de revision actualizadas","Integrar analitica de datos en la identificacion de riesgos emergentes"],
-  ctr:["Mapear y fortalecer controles preventivos en los 5 procesos de mayor riesgo","Implementar pruebas periodicas de efectividad con evidencia documentada","Revisar y corregir deficiencias de segregacion de funciones en areas criticas"],
-  tec:["Implementar alertas automatizadas para transacciones fuera de parametros normales","Activar y centralizar logs de auditoria con retencion adecuada en sistemas criticos","Ejecutar data analytics en ciclos trimestrales para deteccion de irregularidades"],
-  cmp:["Disenar y ejecutar programa anual de capacitacion en compliance y prevencion de fraude","Designar un responsable formal de cumplimiento (Compliance Officer)","Revisar contratos con proveedores e incorporar clausulas antifraude estandar"],
-  rsp:["Documentar y aprobar protocolo de respuesta ante incidentes de fraude","Capacitar al equipo de auditoria en tecnicas de investigacion de fraude","Establecer proceso formal de leciones aprendidas post-incidente con distribucion"]
+  gov:["Formalizar y aprobar politica antifraude a nivel directivo con revision anual obligatoria","Implementar canal de denuncias anonimo con proveedor externo e independiente","Incorporar riesgo de fraude en agenda trimestral del Comite de Riesgos","Disenar programa de sensibilizacion etica para toda la organizacion (tone at the top)"],
+  rsk:["Implementar evaluacion anual de riesgos con metodologia estructurada (COSO, ISO 31000)","Desarrollar registro de riesgos con propietarios, scoring y fechas de revision","Integrar analitica descriptiva y predictiva en la identificacion de riesgos emergentes","Vincular resultados de evaluacion de riesgos a la planificacion de auditoria interna"],
+  ctr:["Mapear y fortalecer controles preventivos en los 5 procesos de mayor exposicion","Implementar pruebas de efectividad semestrales con evidencia documentada y trazable","Revisar y corregir deficiencias de segregacion de funciones en procesos financieros y TI","Establecer proceso formal de actualizacion de controles ante amenazas nuevas detectadas"],
+  tec:["Implementar alertas automatizadas parametrizadas para deteccion de anomalias transaccionales","Activar y centralizar logs de auditoria con retencion minima de 1 ano en sistemas criticos","Ejecutar ciclos de data analytics trimestrales con enfoque en deteccion de fraude","Aplicar principio de minimo privilegio y revisar accesos semestralmente"],
+  cmp:["Disenar y ejecutar programa anual de capacitacion en compliance y prevencion de fraude","Designar formalmente un Compliance Officer con autoridad y recursos adecuados","Revisar contratos con proveedores criticos e incorporar clausulas antifraude estandar","Establecer protocolo de reporte a autoridades con tiempos y responsables definidos"],
+  rsp:["Documentar y aprobar protocolo de respuesta ante incidentes con roles y cadena de custodia","Capacitar equipo de auditoria en tecnicas de investigacion forense y preservacion de evidencia","Establecer proceso de documentacion de causas raiz y lecciones aprendidas post-incidente","Implementar indicador de tiempo de deteccion y cierre de casos de fraude"]
 };
 
-// ── ESTADO ────────────────────────────────────────────────────────────────
-let U = {}, dim = 0, ans = [], scores = [], chart = null;
+// ── ESTADO ──────────────────────────────────────────────────────────────────
+let U={}, dim=0, ans=[], scores=[], qscores=[], chart=null, chart2=null;
 
-// ── INICIO ────────────────────────────────────────────────────────────────
-function startA() {
-  const nombre = g('fn').trim(), empresa = g('fe').trim(), email = g('fem').trim();
-  const ok1 = nombre && empresa && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const ckp  = document.getElementById('ckp').checked;
-  document.querySelectorAll('.err').forEach(e => e.style.display='none');
-  if (!nombre)  sh('en');
-  if (!empresa) sh('ee');
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) sh('eem');
-  if (!ckp)     sh('ep');
-  if (!ok1 || !ckp) return;
-  U = { nombre, empresa, email, telefono:g('ft').trim(), cargo:g('fc').trim(), sector:g('fs').trim() };
-  dim = 0; ans = DIMS.map(() => Array(5).fill(null));
+// ── INICIO ───────────────────────────────────────────────────────────────────
+function startA(){
+  const nombre=gv('fn'),empresa=gv('fe'),email=gv('fem');
+  const ckp=document.getElementById('ckp').checked;
+  document.querySelectorAll('.err').forEach(e=>e.style.display='none');
+  let ok=true;
+  if(!nombre){sh('en');ok=false}
+  if(!empresa){sh('ee');ok=false}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){sh('eem');ok=false}
+  if(!ckp){sh('ep');ok=false}
+  if(!ok) return;
+  U={nombre,empresa,email,telefono:gv('ft'),cargo:gv('fc'),sector:gv('fs')};
+  dim=0; ans=DIMS.map(()=>Array(5).fill(null));
   showS(1); renderQ();
 }
+function gv(id){return document.getElementById(id).value.trim()}
+function sh(id){document.getElementById(id).style.display='block'}
+function showS(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s'+n).classList.add('active');window.scrollTo(0,0)}
 
-function g(id) { return document.getElementById(id).value; }
-function sh(id) { document.getElementById(id).style.display='block'; }
-function showS(n) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('s'+n).classList.add('active');
-  window.scrollTo(0,0);
-}
-
-// ── CUESTIONARIO ──────────────────────────────────────────────────────────
-function renderQ() {
-  const d = DIMS[dim], a = ans[dim];
-  const done = a.filter(x=>x!==null).length;
-  const total = d.qs.length;
-  const pct = Math.round(((dim*total + done)/(DIMS.length*total))*100);
-  document.getElementById('prog-lbl').textContent = `Dimension ${dim+1} de ${DIMS.length}`;
-  document.getElementById('prog-pct').textContent = pct+'%';
-  document.getElementById('prog-f').style.width = pct+'%';
-
-  let h = `<div class="dim-hdr">
-    <div class="dim-icon">${d.code}</div>
-    <div><div class="dim-name">${d.name}</div><div class="dim-ct">${total} preguntas · Escala 1–4</div></div>
-  </div>
+// ── CUESTIONARIO ─────────────────────────────────────────────────────────────
+function renderQ(){
+  const d=DIMS[dim],a=ans[dim];
+  const done=a.filter(x=>x!==null).length, total=d.qs.length;
+  const pct=Math.round(((dim*total+done)/(DIMS.length*total))*100);
+  document.getElementById('plbl').textContent=`Dimension ${dim+1} de ${DIMS.length}`;
+  document.getElementById('ppct').textContent=pct+'%';
+  document.getElementById('pf').style.width=pct+'%';
+  let h=`<div class="dh"><div class="di">${d.code}</div><div><div class="dn">${d.name}</div><div class="dc">${total} preguntas · Escala 1–4</div></div></div>
   <p style="font-size:.8rem;color:var(--muted);margin-bottom:1.3rem;line-height:1.5">${d.desc}</p>`;
-
-  d.qs.forEach((q,i) => {
-    h += `<div class="q-block"><div class="q-text"><span style="font-family:var(--mono);font-size:.73rem;color:var(--amber);margin-right:.4rem">${i+1}.</span>${q}</div><div class="scale">`;
-    SCALE.forEach(s => {
-      h += `<div class="sb${a[i]===s.n?' sel':''}" onclick="setA(${i},${s.n})"><span class="sn">${s.n}</span><span class="sl">${s.l}</span></div>`;
-    });
-    h += `</div></div>`;
+  d.qs.forEach((q,i)=>{
+    h+=`<div class="qb"><div class="qt"><span style="font-family:var(--mono);font-size:.72rem;color:var(--amber);margin-right:.4rem">${i+1}.</span>${q}</div><div class="sc">`;
+    SCALE.forEach(s=>{h+=`<div class="sb${a[i]===s.n?' sel':''}" onclick="setA(${i},${s.n})"><span class="sn">${s.n}</span><span class="sl">${s.l}</span></div>`});
+    h+=`</div></div>`;
   });
+  const allDone=a.every(x=>x!==null), isLast=dim===DIMS.length-1;
+  h+=`<div class="qnav"><button class="btn bg" onclick="prevD()" ${dim===0?'disabled style="opacity:.3;cursor:default"':''} style="padding:.6rem 1.1rem">&#8592; Anterior</button>
+  <button class="btn bp" onclick="${isLast?'finish()':'nextD()'}" ${!allDone?'disabled':''} style="padding:.6rem 1.3rem">${isLast?'VER RESULTADOS &#10003;':'Siguiente &#8594;'}</button></div>`;
+  document.getElementById('qcard').innerHTML=h;
+}
+function setA(qi,v){ans[dim][qi]=v;renderQ()}
+function nextD(){if(ans[dim].every(x=>x!==null)){dim++;renderQ();window.scrollTo(0,0)}}
+function prevD(){if(dim>0){dim--;renderQ();window.scrollTo(0,0)}}
 
-  const allDone = a.every(x=>x!==null);
-  const isLast  = dim === DIMS.length-1;
-  h += `<div class="q-nav">
-    <button class="btn btn-g" onclick="prevD()" ${dim===0?'disabled style="opacity:.3;cursor:default"':''} style="padding:.6rem 1.1rem">&#8592; Anterior</button>
-    <button class="btn btn-p" id="btn-nx" onclick="${isLast?'finish()':'nextD()'}" ${!allDone?'disabled':''} style="padding:.6rem 1.3rem">
-      ${isLast?'VER RESULTADOS &#10003;':'Siguiente &#8594;'}
-    </button>
-  </div>`;
-  document.getElementById('qcard').innerHTML = h;
+// ── RESULTADOS ───────────────────────────────────────────────────────────────
+function getMat(sc){return MAT.find(m=>sc>=m.mn&&sc<=m.mx)||MAT[4]}
+function priC(gap){return gap>=2?'pa':gap>=1?'pm':'pb2'}
+function priL(gap){return gap>=2?'CRITICO':gap>=1?'MEDIO':'BAJO'}
+function plazo(gap){return gap>=2?'0–30 dias':gap>=1?'1–3 meses':'3–6 meses'}
+function scoreColor(sc){const m=getMat(sc);return m.co}
+
+function finish(){
+  scores=DIMS.map((_,i)=>ans[i].reduce((s,v)=>s+v,0)/ans[i].length);
+  qscores=ans.map(dim_ans=>[...dim_ans]);
+  const avg=scores.reduce((s,v)=>s+v,0)/scores.length;
+  const mat=getMat(avg);
+  const fecha=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'});
+
+  // ── SCREEN: header
+  document.getElementById('res-hdr').textContent=`${U.nombre} · ${U.empresa}`;
+  document.getElementById('rfecha').textContent=`Evaluado el ${fecha}`;
+
+  // ── SCREEN: badge
+  document.getElementById('rscore').textContent=avg.toFixed(1);
+  document.getElementById('rscore').style.color=mat.co;
+  document.getElementById('rtitle').textContent=`Nivel ${mat.lv} — ${mat.ti}`;
+  document.getElementById('rdesc').textContent=mat.de;
+
+  // ── SCREEN: dim scores
+  let dh='';
+  DIMS.forEach((d,i)=>{
+    const sc=scores[i],m2=getMat(sc);
+    dh+=`<div class="dsr"><div class="dot" style="background:${m2.co}"></div>
+    <div class="dsrl">${d.name}</div>
+    <div class="dsrb"><div class="dsrbar"><div class="dsrf" style="width:${(sc/4)*100}%;background:${m2.co}"></div></div></div>
+    <div class="dsrv" style="color:${m2.co}">${sc.toFixed(1)}</div></div>`;
+  });
+  document.getElementById('dscores').innerHTML=dh;
+
+  // ── SCREEN: radar
+  if(chart) chart.destroy();
+  chart=new Chart(document.getElementById('rc').getContext('2d'),radarCfg(scores,'rc'));
+
+  // ── SCREEN: action plan
+  const gaps=DIMS.map((d,i)=>({d,sc:scores[i],gap:4-scores[i]})).sort((a,b)=>b.gap-a.gap);
+  let ph='',n=0;
+  gaps.slice(0,4).forEach(({d,sc,gap})=>{
+    if(gap<0.4) return;
+    (ACTIONS[d.id]||[]).slice(0,2).forEach(act=>{
+      n++;
+      ph+=`<div class="ai"><div class="ap ${priC(gap)}">${n}</div><div>
+      <strong>${act}</strong>
+      <p>Dimension: ${d.name} &middot; Score: ${sc.toFixed(1)}/4.0 &middot; GAP: ${gap.toFixed(1)}</p>
+      <div class="aimeta"><span class="at">${priL(gap)}</span><span class="at">${plazo(gap)}</span></div>
+      </div></div>`;
+    });
+  });
+  if(!ph) ph=`<p style="color:var(--muted);font-size:.875rem">Excelente nivel de madurez. Continua con el programa de mejora continua.</p>`;
+  document.getElementById('aplan').innerHTML=ph;
+
+  // ── BUILD PDF PAGES ────────────────────────────────────────────────────────
+  buildPDF(avg, mat, fecha, gaps);
+
+  showS(2);
+  sendData(avg, mat);
 }
 
-function setA(qi,v){ ans[dim][qi]=v; renderQ(); }
-function nextD(){ if(ans[dim].every(x=>x!==null)){dim++; renderQ(); window.scrollTo(0,0);} }
-function prevD(){ if(dim>0){dim--; renderQ(); window.scrollTo(0,0);} }
-
-// ── RESULTADOS ────────────────────────────────────────────────────────────
-function finish() {
-  scores = DIMS.map((_,i) => ans[i].reduce((s,v)=>s+v,0)/ans[i].length);
-  const avg = scores.reduce((s,v)=>s+v,0)/scores.length;
-  const mat = MAT.find(m => avg>=m.mn && avg<=m.mx) || MAT[4];
-
-  document.getElementById('res-hdr').textContent = `${U.nombre} · ${U.empresa}`;
-  document.getElementById('rfecha').textContent = `Evaluado el ${new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'})}`;
-  document.getElementById('rscore').textContent = avg.toFixed(1);
-  document.getElementById('rscore').style.color = mat.co;
-  document.getElementById('rtitle').textContent = `Nivel ${mat.lv} — ${mat.ti}`;
-  document.getElementById('rdesc').textContent  = mat.de;
-
-  // Scores dim
-  let dh = '';
-  DIMS.forEach((d,i) => {
-    const sc = scores[i], m2 = MAT.find(m=>sc>=m.mn&&sc<=m.mx)||MAT[4];
-    dh += `<div class="dsr">
-      <div class="dot" style="background:${m2.co}"></div>
-      <div class="dsr-lbl">${d.name}</div>
-      <div class="dsr-bw"><div class="dsr-bar"><div class="dsr-fill" style="width:${(sc/4)*100}%;background:${m2.co}"></div></div></div>
-      <div class="dsr-val" style="color:${m2.co}">${sc.toFixed(1)}</div>
-    </div>`;
-  });
-  document.getElementById('dscores').innerHTML = dh;
-
-  // Radar
-  if(chart) chart.destroy();
-  chart = new Chart(document.getElementById('rc').getContext('2d'),{
+function radarCfg(sc, canvasId){
+  return {
     type:'radar',
     data:{
-      labels: DIMS.map(d=>d.name.length>18?d.name.slice(0,16)+'..':d.name),
+      labels:DIMS.map(d=>d.name.length>14?d.name.slice(0,13)+'..':d.name),
       datasets:[
-        {label:'Tu organizacion',data:scores,backgroundColor:'rgba(200,146,58,.13)',borderColor:'rgba(200,146,58,.8)',pointBackgroundColor:'rgba(200,146,58,.9)',pointBorderColor:'transparent',borderWidth:2},
-        {label:'Nivel objetivo (4)',data:Array(6).fill(4),backgroundColor:'transparent',borderColor:'rgba(247,244,238,.08)',borderDash:[4,4],pointRadius:0,borderWidth:1}
+        {label:'Tu organizacion',data:sc,backgroundColor:'rgba(200,146,58,.13)',borderColor:'rgba(200,146,58,.8)',pointBackgroundColor:'rgba(200,146,58,.9)',pointBorderColor:'transparent',borderWidth:2},
+        {label:'Objetivo (4)',data:Array(6).fill(4),backgroundColor:'transparent',borderColor:'rgba(247,244,238,.1)',borderDash:[4,4],pointRadius:0,borderWidth:1}
       ]
     },
     options:{responsive:true,maintainAspectRatio:true,
@@ -460,66 +639,191 @@ function finish() {
       plugins:{legend:{labels:{color:'rgba(247,244,238,.45)',font:{size:10},boxWidth:9}},
         tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw.toFixed?c.raw.toFixed(1):c.raw}`}}}
     }
-  });
+  };
+}
 
-  // Plan accion
-  const gaps = DIMS.map((d,i)=>({d,sc:scores[i],gap:4-scores[i]})).sort((a,b)=>b.gap-a.gap);
-  let ph='', n=0;
-  const priC = g2 => g2>=2?'p-a':g2>=1?'p-m':'p-b';
-  const priL = g2 => g2>=2?'CRITICO':g2>=1?'MEDIO':'BAJO';
-  const plazo = g2 => g2>=2?'0-30 dias':g2>=1?'1-3 meses':'3-6 meses';
-  gaps.slice(0,4).forEach(({d,sc,gap})=>{
-    if(gap<0.5) return;
-    (ACTIONS[d.id]||[]).slice(0,2).forEach(act=>{
-      n++;
-      ph += `<div class="ai">
-        <div class="ap ${priC(gap)}">${n}</div>
-        <div>
-          <strong>${act}</strong>
-          <p>Dimension: ${d.name} &middot; Score actual: ${sc.toFixed(1)}/4.0</p>
-          <div class="ai-meta">
-            <span class="at">${priL(gap)}</span>
-            <span class="at">${plazo(gap)}</span>
-            <span class="at">GAP: ${gap.toFixed(1)}</span>
+function buildPDF(avg, mat, fecha, gaps){
+  // PAGE 1: PORTADA
+  document.getElementById('pc-score').textContent=avg.toFixed(1);
+  document.getElementById('pc-score').style.color='#C8923A';
+  document.getElementById('pc-title').textContent=`Nivel ${mat.lv} — ${mat.ti}`;
+  document.getElementById('pc-desc').textContent=mat.de;
+  document.getElementById('pc-fecha').textContent=`Evaluado el ${fecha} · Confidencial`;
+  document.getElementById('pc-meta').innerHTML=`
+    <div class="pdf-cv-item"><div class="pdf-cv-lbl">EVALUADO</div><div class="pdf-cv-val">${U.nombre}</div></div>
+    <div class="pdf-cv-item"><div class="pdf-cv-lbl">EMPRESA</div><div class="pdf-cv-val">${U.empresa}</div></div>
+    <div class="pdf-cv-item"><div class="pdf-cv-lbl">CARGO</div><div class="pdf-cv-val">${U.cargo||'—'}</div></div>
+    <div class="pdf-cv-item"><div class="pdf-cv-lbl">SECTOR</div><div class="pdf-cv-val">${U.sector||'—'}</div></div>
+    <div class="pdf-cv-item"><div class="pdf-cv-lbl">EMAIL</div><div class="pdf-cv-val">${U.email}</div></div>
+    <div class="pdf-cv-item"><div class="pdf-cv-lbl">TELEFONO</div><div class="pdf-cv-val">${U.telefono||'—'}</div></div>`;
+
+  // PAGE 2: RADAR (light colors for print)
+  const fdate=fecha;
+  document.getElementById('pdf-f2').textContent=fdate;
+  document.getElementById('pdf-f3').textContent=fdate;
+  document.getElementById('pdf-f4').textContent=fdate;
+
+  // Radar for PDF (light theme)
+  setTimeout(()=>{
+    if(chart2) chart2.destroy();
+    const ctx2=document.getElementById('rc2');
+    if(ctx2){
+      chart2=new Chart(ctx2.getContext('2d'),{
+        type:'radar',
+        data:{
+          labels:DIMS.map(d=>d.name.length>14?d.name.slice(0,13)+'..':d.name),
+          datasets:[
+            {label:'Tu organizacion',data:scores,backgroundColor:'rgba(200,146,58,.15)',borderColor:'#C8923A',pointBackgroundColor:'#C8923A',borderWidth:2},
+            {label:'Objetivo (4)',data:Array(6).fill(4),backgroundColor:'transparent',borderColor:'rgba(0,0,0,.1)',borderDash:[3,3],pointRadius:0,borderWidth:1}
+          ]
+        },
+        options:{responsive:true,maintainAspectRatio:true,
+          scales:{r:{min:0,max:4,ticks:{stepSize:1,color:'#888',backdropColor:'transparent',font:{size:8}},
+            grid:{color:'rgba(0,0,0,.08)'},pointLabels:{color:'#333',font:{size:9}},angleLines:{color:'rgba(0,0,0,.08)'}}},
+          plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:8}}}
+        }
+      });
+    }
+  },300);
+
+  // Dim rows PDF
+  let dr='';
+  DIMS.forEach((d,i)=>{
+    const sc=scores[i],m2=getMat(sc);
+    const lvlTx=m2.ti;
+    dr+=`<div class="pdf-dim-row">
+      <div class="pdf-dim-dot" style="background:${m2.co}"></div>
+      <div class="pdf-dim-name">${d.code} ${d.name}</div>
+      <div class="pdf-dim-barwrap"><div class="pdf-dim-bar"><div class="pdf-dim-fill" style="width:${(sc/4)*100}%;background:${m2.co}"></div></div></div>
+      <div class="pdf-dim-score" style="color:${m2.co}">${sc.toFixed(1)}</div>
+      <div class="pdf-dim-level" style="background:${m2.bg};color:${m2.co}">${lvlTx}</div>
+    </div>`;
+  });
+  document.getElementById('pdf-dim-rows').innerHTML=dr;
+
+  // PAGE 3: QUESTION DETAIL
+  let qh='';
+  DIMS.forEach((d,i)=>{
+    const dsc=scores[i],dm2=getMat(dsc);
+    qh+=`<div class="pdf-qdim">
+      <div class="pdf-qdim-title">${d.code} ${d.name} — Score: ${dsc.toFixed(1)}/4.0 · ${dm2.ti}</div>`;
+    d.qs.forEach((q,qi)=>{
+      const qs=qscores[i][qi]||0, qm=getMat(qs);
+      qh+=`<div class="pdf-qrow">
+        <div class="pdf-qnum">${qi+1}.</div>
+        <div class="pdf-qtext">${q}</div>
+        <div class="pdf-qbar"><div class="pdf-qbarinner"><div class="pdf-qbarfill" style="width:${qs*25}%;background:${qm.co}"></div></div></div>
+        <div class="pdf-qscore" style="color:${qm.co}">${qs}/4 ${SCALE.find(s=>s.n===qs)?.l||''}</div>
+      </div>`;
+    });
+    qh+=`</div>`;
+  });
+  document.getElementById('pdf-qdetail').innerHTML=qh;
+
+  // PAGE 4: ACTIONS + KPIs
+  let ah=''; let n2=0;
+  gaps.forEach(({d,sc,gap})=>{
+    if(gap<0.4) return;
+    const acts=(ACTIONS[d.id]||[]).slice(0,3);
+    acts.forEach((act,ai)=>{
+      n2++;
+      const pc=gap>=2?'pdf-ai-crit':gap>=1?'pdf-ai-med':'pdf-ai-low';
+      const kpi=d.kpis[ai]||d.kpis[0];
+      ah+=`<div class="pdf-action-item">
+        <div class="pdf-ai-header">
+          <div class="pdf-ai-num ${pc}">${n2}</div>
+          <div>
+            <div class="pdf-ai-title">${act}</div>
+            <div class="pdf-ai-dim">${d.name} · Score actual: ${sc.toFixed(1)}/4.0 · GAP: ${gap.toFixed(1)} · Prioridad: ${priL(gap)} · Plazo: ${plazo(gap)}</div>
           </div>
+        </div>
+        <div class="pdf-kpis">
+          <div class="pdf-kpi"><div class="pdf-kpi-lbl">KPI SUGERIDO</div><div class="pdf-kpi-val">${kpi.k}</div></div>
+          <div class="pdf-kpi"><div class="pdf-kpi-lbl">META REFERENCIA</div><div class="pdf-kpi-val">${kpi.meta}</div></div>
         </div>
       </div>`;
     });
   });
-  if(!ph) ph=`<p style="color:var(--muted);font-size:.875rem">Excelente nivel de madurez. Continua con el programa de mejora continua.</p>`;
-  document.getElementById('aplan').innerHTML = ph;
+  if(!ah) ah=`<p style="font-size:9px;color:#888">Excelente nivel. Enfocate en mejora continua y optimizacion de controles existentes.</p>`;
+  document.getElementById('pdf-actions').innerHTML=ah;
 
-  showS(2);
-  sendData(avg, mat);
+  // KPIs globales por dimension
+  let kg='';
+  DIMS.forEach((d,i)=>{
+    const sc=scores[i], m2=getMat(sc);
+    kg+=`<div style="margin-bottom:4mm;break-inside:avoid">
+      <div style="font-family:var(--mono);font-size:8px;color:${m2.co};font-weight:500;margin-bottom:1.5mm;text-transform:uppercase">${d.code} ${d.name} (${sc.toFixed(1)}/4.0 · ${m2.ti})</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.5mm">`;
+    d.kpis.forEach(kpi=>{
+      kg+=`<div class="pdf-kpi"><div class="pdf-kpi-lbl">KPI</div><div class="pdf-kpi-val">${kpi.k}</div><div style="font-size:7px;color:#C8923A;margin-top:.5mm">Meta: ${kpi.meta}</div></div>`;
+    });
+    kg+=`</div></div>`;
+  });
+  document.getElementById('pdf-kpis-global').innerHTML=kg;
 }
 
-// ── ENVIO A GOOGLE SHEETS ─────────────────────────────────────────────────
-async function sendData(avg, mat) {
-  if(SHEETS_URL==="TU_GOOGLE_APPS_SCRIPT_URL_AQUI") return;
-  const body = {
-    timestamp: new Date().toISOString(),
+// ── PRINT ─────────────────────────────────────────────────────────────────────
+function doPrint(){
+  setTimeout(()=>window.print(), 400);
+}
+
+// ── ENVIO A GOOGLE SHEETS ─────────────────────────────────────────────────────
+async function sendData(avg, mat){
+  // Construir resumen de acciones top 3
+  const gaps=DIMS.map((d,i)=>({d,sc:scores[i],gap:4-scores[i]})).sort((a,b)=>b.gap-a.gap);
+  const topAcciones=[];
+  gaps.slice(0,3).forEach(({d,gap})=>{
+    if(gap<0.3) return;
+    topAcciones.push(`${d.name}(${priL(gap)}): ${(ACTIONS[d.id]||[])[0]||''}`);
+  });
+
+  const dimMasDebil=gaps[0]?.d?.name||'';
+  const dimMasFuerte=[...DIMS.map((d,i)=>({d,sc:scores[i]}))].sort((a,b)=>b.sc-a.sc)[0]?.d?.name||'';
+
+  const body={
+    timestamp:new Date().toISOString(),
+    // Datos de contacto
     nombre:U.nombre, empresa:U.empresa, email:U.email,
     telefono:U.telefono, cargo:U.cargo, sector:U.sector,
+    // Resultado general
     nivel_madurez:mat.lv, titulo_madurez:mat.ti,
     score_general:avg.toFixed(2),
-    gobernanza:scores[0].toFixed(2), gestion_riesgos:scores[1].toFixed(2),
-    controles:scores[2].toFixed(2),  tecnologia:scores[3].toFixed(2),
-    cumplimiento:scores[4].toFixed(2), respuesta:scores[5].toFixed(2)
+    // Scores por dimension
+    d1_gobernanza:scores[0].toFixed(2),
+    d2_gestion_riesgos:scores[1].toFixed(2),
+    d3_controles:scores[2].toFixed(2),
+    d4_tecnologia:scores[3].toFixed(2),
+    d5_cumplimiento:scores[4].toFixed(2),
+    d6_respuesta:scores[5].toFixed(2),
+    // Scores individuales por pregunta (30 preguntas)
+    ...Object.fromEntries(DIMS.flatMap((d,di)=>
+      d.qs.map((_,qi)=>[`${d.id}_q${qi+1}`, qscores[di][qi]])
+    )),
+    // Inteligencia para el asesor
+    dim_mas_debil:dimMasDebil,
+    dim_mas_fuerte:dimMasFuerte,
+    gap_promedio:(gaps.reduce((s,g)=>s+g.gap,0)/gaps.length).toFixed(2),
+    top3_acciones:topAcciones.join(' | '),
+    nivel_urgencia:avg<=2?'ALTA':avg<=3?'MEDIA':'BAJA',
+    potencial_servicio:avg<=2?'Programa integral de control antifraude':
+                       avg<=3?'Fortalecimiento de controles y capacitacion':'Optimizacion y mejora continua'
   };
-  try {
+
+  try{
     await fetch(SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     showToast('Resultado registrado correctamente');
-  } catch(e) { console.warn('Sheets error:',e); }
+  }catch(e){console.warn('Sheets:',e)}
 }
 
-function openP(){ document.getElementById('modal-p').classList.add('open'); }
-function closeP(){ document.getElementById('modal-p').classList.remove('open'); }
+function openP(){document.getElementById('modal-p').classList.add('open')}
+function closeP(){document.getElementById('modal-p').classList.remove('open')}
 function showToast(msg){
   const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
+  t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3500);
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeP();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeP()});
 </script>
 </body>
 </html>
+
