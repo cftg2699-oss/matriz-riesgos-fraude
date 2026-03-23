@@ -189,31 +189,25 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
   .pdf-kpi-val{font-size:8.5px;color:#2C2C2A;line-height:1.4}
   .pdf-footer{margin-top:6mm;padding-top:3mm;border-top:1px solid #e0d8cc;font-family:var(--mono);font-size:8px;color:#aaa;display:flex;justify-content:space-between}
 
-  /* OCULTAR ELEMENTOS DE PANTALLA — selectores explícitos sin last-child */
-  #s2 .rgrid                                      { display: none !important; }
-  #s2 .card-wide > .lbl                           { display: none !important; }
-  #s2 .card-wide > h2                             { display: none !important; }
-  #s2 #dscores                                    { display: none !important; }
-  #s2 #rfecha                                     { display: none !important; }
-  #s2 > .card-wide > div[style*="justify-content"]  { display: none !important; }
+  /* OCULTAR ELEMENTOS DE PANTALLA — sin last-child */
+  #s2 .rgrid                                           { display: none !important; }
+  #s2 .card-wide > .lbl                                { display: none !important; }
+  #s2 .card-wide > h2                                  { display: none !important; }
+  #s2 #dscores                                         { display: none !important; }
+  #s2 #rfecha                                          { display: none !important; }
+  #s2 > .card-wide > div[style*="justify-content"]     { display: none !important; }
 
-  /* FORZAR VISIBILIDAD — doble-id supera cualquier regla anterior (1,2,1) */
+  /* FORZAR VISIBILIDAD — doble-id gana especificidad */
   #s2 #pdf-p1, #s2 #pdf-p2, #s2 #pdf-p3, #s2 #pdf-p4 {
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+    display: block !important; opacity: 1 !important; visibility: visible !important;
   }
-
-  /* Salto de página explícito para páginas PDF */
-  #s2 #pdf-p1 { page-break-after: always !important; }
-  #s2 #pdf-p2 { page-break-after: always !important; }
-  #s2 #pdf-p3 { page-break-after: always !important; }
+  #s2 #pdf-p1 { page-break-after:  always !important; }
+  #s2 #pdf-p2 { page-break-after:  always !important; }
+  #s2 #pdf-p3 { page-break-after:  always !important; }
   #s2 #pdf-p4 { page-break-before: always !important; }
-
-  #pdf-actions { display: block !important; min-height: 20px; }
-  #pdf-kpis-global { display: block !important; }
-
-} /* AQUÍ TERMINA EL @media print */
+  #pdf-actions      { display: block !important; min-height: 20px; }
+  #pdf-kpis-global  { display: block !important; }
+} /* FIN @media print */
 
 /* ── Screen - hide pdf sections ──────────────────────────────────────── */
 .pdf-cover, .pdf-s1, .pdf-s2, .pdf-s3 { display: none; }
@@ -410,97 +404,121 @@ const SHEETS_URL = "https://script.google.com/macros/s/AKfycbwakVdEvdqsZqWSNoQNn
   // PEGA LA LÍNEA JUSTO AQUÍ:
 const estKPI = (s) => s < 2 ? "Deficiente (<40%)" : s < 3 ? "En proceso (40-75%)" : "Cerca de meta (>80%)";
 
-// ── DIMENSIONES ────────────────────────────────────────────────────────────
+// ── DIMENSIONES — action y kpi por pregunta individual ─────────────────────
 const DIMS = [
   { id:"gov", code:"01", name:"Gobierno y Cultura Antifraude",
     desc:"Compromiso directivo, cultura etica y estructura de supervision.",
     qs:[
-      "La organizacion cuenta con una politica antifraude aprobada por la alta direccion.",
-      "Existe un Comite de Riesgos que supervisa activamente los riesgos de fraude.",
-      "El codigo de conducta cubre el fraude y es comunicado periodicamente a todos.",
-      "La alta direccion demuestra activamente el tono etico e integridad (tone at the top).",
-      "Existen canales anonimos y seguros para reportar sospechas de fraude."
-    ],
-    kpis:[
-      {k:"% empleados capacitados en politica antifraude",meta:"≥ 90% anual"},
-      {k:"Numero de denuncias recibidas por canal anonimo",meta:"Monitoreo trimestral"},
-      {k:"Frecuencia de revision de politica antifraude",meta:"≥ 1 vez/año"},
-      {k:"% de incidentes escalados al Comite de Riesgos",meta:"100% de casos graves"}
+      { t:"La organizacion cuenta con una politica antifraude aprobada por la alta direccion.",
+        action:"Redactar, aprobar y publicar una politica antifraude formal firmada por la alta direccion con revision anual obligatoria.",
+        kpi:{k:"Politica antifraude vigente, aprobada por directorio y publicada",meta:"1 politica activa · revision anual documentada"} },
+      { t:"Existe un Comite de Riesgos que supervisa activamente los riesgos de fraude.",
+        action:"Constituir o fortalecer el Comite de Riesgos incorporando el riesgo de fraude en su agenda trimestral con actas documentadas.",
+        kpi:{k:"Sesiones del Comite de Riesgos con agenda de fraude documentada",meta:"≥ 4 sesiones anuales con acta"} },
+      { t:"El codigo de conducta cubre el fraude y es comunicado periodicamente a todos.",
+        action:"Actualizar el codigo de conducta para incluir ejemplos de fraude y ejecutar campana anual de comunicacion con constancia de recepcion.",
+        kpi:{k:"% colaboradores que firmaron el codigo de conducta actualizado",meta:"≥ 95% anual"} },
+      { t:"La alta direccion demuestra activamente el tono etico e integridad (tone at the top).",
+        action:"Disenar programa de liderazgo etico: comunicaciones directivas, mensajes institucionales y reconocimiento publico de comportamientos eticos.",
+        kpi:{k:"Numero de comunicaciones de liderazgo sobre etica e integridad",meta:"≥ 4 comunicaciones anuales documentadas"} },
+      { t:"Existen canales anonimos y seguros para reportar sospechas de fraude.",
+        action:"Contratar o implementar un canal de denuncias anonimo independiente (linea etica), promoverlo activamente y garantizar investigacion de cada reporte.",
+        kpi:{k:"% de denuncias recibidas e investigadas dentro del plazo",meta:"100% investigadas en ≤ 15 dias habiles"} }
     ]},
   { id:"rsk", code:"02", name:"Gestion de Riesgos de Fraude",
     desc:"Metodologia de identificacion, valoracion y priorizacion de riesgos.",
     qs:[
-      "Se realiza una evaluacion formal de riesgos de fraude al menos una vez al año.",
-      "El proceso cubre todos los procesos criticos y areas de alto riesgo.",
-      "Los riesgos se documentan en un registro actualizado con responsables asignados.",
-      "Se usan herramientas analiticas para identificar riesgos emergentes de fraude.",
-      "Los resultados se usan para priorizar recursos de auditoria interna."
-    ],
-    kpis:[
-      {k:"Numero de riesgos de fraude identificados y documentados",meta:"Actualizacion anual"},
-      {k:"% de riesgos criticos con plan de mitigacion activo",meta:"100%"},
-      {k:"Tiempo promedio entre identificacion y mitigacion de riesgo",meta:"≤ 30 dias"},
-      {k:"% de procesos cubiertos en la evaluacion de riesgos",meta:"≥ 80% de procesos criticos"}
+      { t:"Se realiza una evaluacion formal de riesgos de fraude al menos una vez al año.",
+        action:"Implementar metodologia estructurada de evaluacion de riesgos de fraude (COSO, ISO 31000) con calendario anual fijo y responsables designados.",
+        kpi:{k:"Evaluaciones de riesgo de fraude realizadas por año",meta:"≥ 1 evaluacion anual documentada"} },
+      { t:"El proceso cubre todos los procesos criticos y areas de alto riesgo.",
+        action:"Mapear todos los procesos criticos y garantizar cobertura minima del 80% en la evaluacion de riesgos de fraude con evidencia de alcance.",
+        kpi:{k:"% de procesos criticos incluidos en la evaluacion de riesgos",meta:"≥ 80% de procesos criticos cubiertos"} },
+      { t:"Los riesgos se documentan en un registro actualizado con responsables asignados.",
+        action:"Crear y mantener registro de riesgos de fraude con propietario, scoring, fecha de revision y estado de mitigacion actualizado trimestralmente.",
+        kpi:{k:"% de riesgos criticos con propietario asignado y plan de mitigacion activo",meta:"100%"} },
+      { t:"Se usan herramientas analiticas para identificar riesgos emergentes de fraude.",
+        action:"Integrar herramientas de analitica (Power BI, ACL, Python o similar) en el proceso de identificacion de riesgos emergentes con ciclo trimestral.",
+        kpi:{k:"Ciclos de analisis de riesgos emergentes ejecutados por año",meta:"≥ 4 ciclos anuales con informe de hallazgos"} },
+      { t:"Los resultados se usan para priorizar recursos de auditoria interna.",
+        action:"Vincular formalmente el plan anual de auditoria interna con los resultados de la evaluacion de riesgos de fraude priorizando areas de mayor score.",
+        kpi:{k:"% del plan de auditoria alineado a riesgos de fraude identificados",meta:"≥ 70% de recursos en areas de riesgo alto"} }
     ]},
   { id:"ctr", code:"03", name:"Controles Internos Antifraude",
     desc:"Efectividad, cobertura y monitoreo de controles preventivos y detectivos.",
     qs:[
-      "Existen controles preventivos especificos para los riesgos de fraude identificados.",
-      "Hay segregacion de funciones adecuada en procesos de mayor exposicion.",
-      "Se realizan pruebas periodicas de efectividad de controles antifraude.",
-      "Los controles detectivos (conciliaciones, auditorias sorpresa, logs) se ejecutan con regularidad.",
-      "Existe un proceso para actualizar controles ante nuevas amenazas detectadas."
-    ],
-    kpis:[
-      {k:"% de controles clave probados en el periodo",meta:"≥ 85% anual"},
-      {k:"Numero de deficiencias de control identificadas",meta:"Reduccion interanual"},
-      {k:"Tiempo promedio de remediacion de deficiencias criticas",meta:"≤ 15 dias"},
-      {k:"% de procesos con segregacion de funciones validada",meta:"100% procesos criticos"}
+      { t:"Existen controles preventivos especificos para los riesgos de fraude identificados.",
+        action:"Mapear los 5 procesos de mayor exposicion al fraude e implementar controles preventivos especificos con documentacion de diseno y responsable asignado.",
+        kpi:{k:"% de riesgos criticos de fraude con control preventivo documentado",meta:"100% de riesgos criticos cubiertos"} },
+      { t:"Hay segregacion de funciones adecuada en procesos de mayor exposicion.",
+        action:"Realizar diagnostico de segregacion de funciones en procesos financieros y TI, corregir conflictos identificados y documentar la matriz de roles actualizada.",
+        kpi:{k:"% de procesos criticos con segregacion de funciones validada y sin conflictos",meta:"100% de procesos criticos"} },
+      { t:"Se realizan pruebas periodicas de efectividad de controles antifraude.",
+        action:"Establecer programa semestral de pruebas de efectividad de controles con evidencia documentada, hallazgos y planes de remediacion con seguimiento.",
+        kpi:{k:"% de controles clave probados en el semestre",meta:"≥ 85% de controles clave con evidencia documentada"} },
+      { t:"Los controles detectivos (conciliaciones, auditorias sorpresa, logs) se ejecutan con regularidad.",
+        action:"Formalizar calendario de controles detectivos: conciliaciones mensuales, auditorias sorpresa trimestrales y revision de logs semanal en sistemas criticos.",
+        kpi:{k:"% de controles detectivos ejecutados segun calendario definido",meta:"≥ 95% de cumplimiento del calendario"} },
+      { t:"Existe un proceso para actualizar controles ante nuevas amenazas detectadas.",
+        action:"Crear protocolo formal de actualizacion de controles: ante incidente, nueva alerta de riesgo o cambio operativo significativo, revisar y actualizar en ≤ 30 dias.",
+        kpi:{k:"Tiempo promedio de actualizacion de controles ante nueva amenaza detectada",meta:"≤ 30 dias desde identificacion de amenaza"} }
     ]},
   { id:"tec", code:"04", name:"Tecnologia y Analitica de Datos",
     desc:"Uso de herramientas tecnologicas para prevencion, deteccion y monitoreo.",
     qs:[
-      "Se usan herramientas de analisis de datos para detectar anomalias y patrones de fraude.",
-      "Existen alertas automatizadas para comportamientos transaccionales inusuales.",
-      "Los registros de auditoria (logs) son completos, protegidos y revisados periodicamente.",
-      "Los sistemas aplican el principio de minimo privilegio en control de accesos.",
-      "Se ejecutan analisis de datos masivos (data analytics) al menos trimestralmente."
-    ],
-    kpis:[
-      {k:"Numero de alertas automatizadas generadas por periodo",meta:"Revision mensual de tendencia"},
-      {k:"% de alertas investigadas dentro del SLA definido",meta:"≥ 95% en 48h"},
-      {k:"Tasa de falsos positivos en el sistema de alertas",meta:"≤ 15%"},
-      {k:"Cobertura de logs activos en sistemas criticos",meta:"100% de sistemas criticos"}
+      { t:"Se usan herramientas de analisis de datos para detectar anomalias y patrones de fraude.",
+        action:"Implementar o fortalecer el uso de herramientas de analitica (ACL, IDEA, Power BI, Python) para deteccion de anomalias en transacciones con ciclo minimo mensual.",
+        kpi:{k:"Ciclos de analisis de datos para deteccion de fraude ejecutados por año",meta:"≥ 12 ciclos anuales (frecuencia mensual)"} },
+      { t:"Existen alertas automatizadas para comportamientos transaccionales inusuales.",
+        action:"Parametrizar y activar alertas automatizadas en ERP o core bancario para detectar transacciones fuera de rangos normales: montos, horarios, frecuencia y beneficiarios.",
+        kpi:{k:"% de alertas criticas generadas e investigadas dentro del SLA",meta:"≥ 95% investigadas en ≤ 48 horas"} },
+      { t:"Los registros de auditoria (logs) son completos, protegidos y revisados periodicamente.",
+        action:"Activar logs completos en todos los sistemas criticos, centralizar en repositorio protegido con retencion minima de 12 meses y establecer revision semanal formal.",
+        kpi:{k:"Cobertura de logs activos, completos y protegidos en sistemas criticos",meta:"100% de sistemas criticos con logs activos"} },
+      { t:"Los sistemas aplican el principio de minimo privilegio en control de accesos.",
+        action:"Ejecutar revision completa de perfiles de acceso, eliminar privilegios innecesarios, implementar RBAC y programar revision semestral de accesos con evidencia.",
+        kpi:{k:"% de usuarios con accesos revisados y ajustados al minimo necesario",meta:"100% revisados semestralmente"} },
+      { t:"Se ejecutan analisis de datos masivos (data analytics) al menos trimestralmente.",
+        action:"Establecer programa trimestral de data analytics antifraude con casos de uso definidos: duplicados, pagos fraccionados, concentracion de proveedores y anomalias en nomina.",
+        kpi:{k:"Informes de hallazgos de data analytics antifraude generados por trimestre",meta:"≥ 1 informe por trimestre con hallazgos documentados"} }
     ]},
   { id:"cmp", code:"05", name:"Cumplimiento Regulatorio y Legal",
     desc:"Alineamiento con normativas y estandares aplicables en materia antifraude.",
     qs:[
-      "La organizacion conoce y cumple las regulaciones aplicables en prevencion de fraude.",
-      "Existe un programa formal de Compliance con responsable designado.",
-      "Se realizan capacitaciones obligatorias en prevencion de fraude al menos una vez al año.",
-      "Existe proceso para reportar incidentes de fraude a las autoridades cuando corresponde.",
-      "Los contratos con proveedores incluyen clausulas antifraude y anticorrupcion."
-    ],
-    kpis:[
-      {k:"Numero de hallazgos regulatorios por periodo",meta:"Reduccion interanual"},
-      {k:"% contratos con proveedores criticos con clausulas antifraude",meta:"100%"},
-      {k:"% empleados con capacitacion en compliance completada",meta:"≥ 90% anual"},
-      {k:"Tiempo de respuesta ante requerimientos regulatorios",meta:"≤ plazo normativo"}
+      { t:"La organizacion conoce y cumple las regulaciones aplicables en prevencion de fraude.",
+        action:"Realizar mapeo regulatorio completo de normas aplicables, documentar obligaciones y asignar responsables de cumplimiento por norma con revision semestral.",
+        kpi:{k:"% de obligaciones regulatorias de prevencion de fraude cumplidas",meta:"100% de obligaciones vigentes cumplidas"} },
+      { t:"Existe un programa formal de Compliance con responsable designado.",
+        action:"Designar formalmente un Compliance Officer con mandato, recursos y acceso directo a la alta direccion. Documentar el programa de compliance con metas anuales.",
+        kpi:{k:"Programa de compliance documentado, activo y con presupuesto asignado",meta:"1 programa activo con responsable y metas anuales definidas"} },
+      { t:"Se realizan capacitaciones obligatorias en prevencion de fraude al menos una vez al año.",
+        action:"Disenar e implementar programa anual de capacitacion en prevencion de fraude: obligatorio para todos, con evaluacion de conocimiento, constancia y seguimiento.",
+        kpi:{k:"% colaboradores con capacitacion en prevencion de fraude completada",meta:"≥ 90% anual con nota aprobatoria ≥ 70%"} },
+      { t:"Existe proceso para reportar incidentes de fraude a las autoridades cuando corresponde.",
+        action:"Documentar protocolo de reporte a autoridades competentes con plazos, formatos y responsables definidos segun normativa vigente. Realizar simulacro anual.",
+        kpi:{k:"% de incidentes que requerian reporte a autoridades y fueron reportados en plazo",meta:"100% reportados dentro del plazo normativo"} },
+      { t:"Los contratos con proveedores incluyen clausulas antifraude y anticorrupcion.",
+        action:"Revisar y actualizar contratos con proveedores criticos para incluir clausulas antifraude, anticorrupcion y derecho de auditoria. Incorporar en plantilla estandar.",
+        kpi:{k:"% de contratos con proveedores criticos con clausulas antifraude incluidas",meta:"100% contratos nuevos · ≥ 80% contratos vigentes"} }
     ]},
   { id:"rsp", code:"06", name:"Respuesta e Investigacion de Fraude",
     desc:"Capacidad para detectar, investigar y responder ante incidentes.",
     qs:[
-      "Existe un protocolo documentado de respuesta a incidentes con cadena de custodia.",
-      "La organizacion tiene personal capacitado para investigaciones internas de fraude.",
-      "Los casos de fraude se documentan y analizan para identificar causas raiz.",
-      "Existe coordinacion formal con areas legales, RRHH y direccion para incidentes.",
-      "Las lecciones aprendidas de incidentes se comunican a la organizacion."
-    ],
-    kpis:[
-      {k:"Tiempo promedio de deteccion de un incidente de fraude",meta:"Reduccion interanual"},
-      {k:"Tiempo promedio de investigacion y cierre de casos",meta:"≤ 45 dias"},
-      {k:"% de casos con recuperacion de activos",meta:"Monitoreo semestral"},
-      {k:"Numero de mejoras implementadas por lecciones aprendidas",meta:"≥ 2 por incidente"}
+      { t:"Existe un protocolo documentado de respuesta a incidentes con cadena de custodia.",
+        action:"Documentar, aprobar y difundir protocolo de respuesta a incidentes de fraude: roles, tiempos, cadena de custodia de evidencia y criterios de escalamiento.",
+        kpi:{k:"% de incidentes de fraude gestionados segun protocolo documentado",meta:"100% de incidentes con protocolo aplicado"} },
+      { t:"La organizacion tiene personal capacitado para investigaciones internas de fraude.",
+        action:"Capacitar al equipo de auditoria interna en tecnicas de investigacion de fraude: entrevistas, analisis forense digital y preservacion de evidencia (CFE u equivalente).",
+        kpi:{k:"Numero de auditores certificados o capacitados en investigacion de fraude",meta:"≥ 1 auditor con certificacion CFE o equivalente"} },
+      { t:"Los casos de fraude se documentan y analizan para identificar causas raiz.",
+        action:"Implementar proceso obligatorio de documentacion post-incidente: causa raiz, impacto, controles fallidos y acciones correctivas con seguimiento hasta cierre total.",
+        kpi:{k:"% de casos de fraude cerrados con analisis de causa raiz documentado",meta:"100% de casos cerrados con analisis documentado"} },
+      { t:"Existe coordinacion formal con areas legales, RRHH y direccion para incidentes.",
+        action:"Establecer protocolo de coordinacion interareal: roles de Legal, RRHH, Auditoria y Direccion con tiempos de respuesta y canales de comunicacion definidos y probados.",
+        kpi:{k:"Tiempo promedio de activacion del equipo multidisciplinario ante incidente",meta:"≤ 4 horas habiles desde deteccion del incidente"} },
+      { t:"Las lecciones aprendidas de incidentes se comunican a la organizacion.",
+        action:"Crear proceso formal de lecciones aprendidas: informe ejecutivo post-incidente, comunicacion a areas afectadas y actualizacion del registro de riesgos y controles.",
+        kpi:{k:"% de incidentes con informe de lecciones aprendidas distribuido",meta:"100% de incidentes con informe en ≤ 30 dias del cierre"} }
     ]}
 ];
 
@@ -512,14 +530,6 @@ const MAT = [
   {mn:3.25,mx:3.74,lv:4,ti:"Medido",     de:"Metricas activas y monitoreo continuo con analitica.",     co:"#5A9E72",bg:"#C6EFCE"},
   {mn:3.75,mx:4.0,lv:5,ti:"Optimizado",  de:"Cultura antifraude consolidada. Analitica predictiva.",    co:"#2E6B4F",bg:"#9FC99F"},
 ];
-const ACTIONS = {
-  gov:["Formalizar y aprobar politica antifraude a nivel directivo con revision anual obligatoria","Implementar canal de denuncias anonimo con proveedor externo e independiente","Incorporar riesgo de fraude en agenda trimestral del Comite de Riesgos","Disenar programa de sensibilizacion etica para toda la organizacion (tone at the top)"],
-  rsk:["Implementar evaluacion anual de riesgos con metodologia estructurada (COSO, ISO 31000)","Desarrollar registro de riesgos con propietarios, scoring y fechas de revision","Integrar analitica descriptiva y predictiva en la identificacion de riesgos emergentes","Vincular resultados de evaluacion de riesgos a la planificacion de auditoria interna"],
-  ctr:["Mapear y fortalecer controles preventivos en los 5 procesos de mayor exposicion","Implementar pruebas de efectividad semestrales con evidencia documentada y trazable","Revisar y corregir deficiencias de segregacion de funciones en procesos financieros y TI","Establecer proceso formal de actualizacion de controles ante amenazas nuevas detectadas"],
-  tec:["Implementar alertas automatizadas parametrizadas para deteccion de anomalias transaccionales","Activar y centralizar logs de auditoria con retencion minima de 1 ano en sistemas criticos","Ejecutar ciclos de data analytics trimestrales con enfoque en deteccion de fraude","Aplicar principio de minimo privilegio y revisar accesos semestralmente"],
-  cmp:["Disenar y ejecutar programa anual de capacitacion en compliance y prevencion de fraude","Designar formalmente un Compliance Officer con autoridad y recursos adecuados","Revisar contratos con proveedores criticos e incorporar clausulas antifraude estandar","Establecer protocolo de reporte a autoridades con tiempos y responsables definidos"],
-  rsp:["Documentar y aprobar protocolo de respuesta ante incidentes con roles y cadena de custodia","Capacitar equipo de auditoria en tecnicas de investigacion forense y preservacion de evidencia","Establecer proceso de documentacion de causas raiz y lecciones aprendidas post-incidente","Implementar indicador de tiempo de deteccion y cierre de casos de fraude"]
-};
 
 // ── ESTADO ──────────────────────────────────────────────────────────────────
 let U={}, dim=0, ans=[], scores=[], qscores=[], chart=null, chart2=null;
@@ -554,7 +564,8 @@ function renderQ(){
   let h=`<div class="dh"><div class="di">${d.code}</div><div><div class="dn">${d.name}</div><div class="dc">${total} preguntas · Escala 1–4</div></div></div>
   <p style="font-size:.8rem;color:var(--muted);margin-bottom:1.3rem;line-height:1.5">${d.desc}</p>`;
   d.qs.forEach((q,i)=>{
-    h+=`<div class="qb"><div class="qt"><span style="font-family:var(--mono);font-size:.72rem;color:var(--amber);margin-right:.4rem">${i+1}.</span>${q}</div><div class="sc">`;
+    const qtext = typeof q === 'object' ? q.t : q;
+    h+=`<div class="qb"><div class="qt"><span style="font-family:var(--mono);font-size:.72rem;color:var(--amber);margin-right:.4rem">${i+1}.</span>${qtext}</div><div class="sc">`;
     SCALE.forEach(s=>{h+=`<div class="sb${a[i]===s.n?' sel':''}" onclick="setA(${i},${s.n})"><span class="sn">${s.n}</span><span class="sl">${s.l}</span></div>`});
     h+=`</div></div>`;
   });
@@ -606,30 +617,32 @@ function finish(){
   if(chart) chart.destroy();
   chart=new Chart(document.getElementById('rc').getContext('2d'),radarCfg(scores,'rc'));
 
-  // ── SCREEN: action plan
-  const gaps=DIMS.map((d,i)=>({d,sc:scores[i],gap:4-scores[i]})).sort((a,b)=>b.gap-a.gap);
-  let ph='',n=0;
-  // Tomamos las 6 dimensiones (slice 0,6) y quitamos el filtro de 0.4
-gaps.slice(0,6).forEach(({d,sc,gap})=>{
-  // Definimos la lógica de venta: si el gap es pequeño, es 'Optimización'
-  const prio = gap >= 1.5 ? 'CRÍTICO' : gap >= 0.7 ? 'MEDIO' : 'OPTIMIZACIÓN';
-  const cls = gap >= 1.5 ? 'pa' : gap >= 0.7 ? 'pm' : 'pb2';
-
-  (ACTIONS[d.id]||[]).slice(0,2).forEach(act=>{
-  n++;
-  ph += `<div class="ai">
-    <div class="ap ${cls}">${n}</div>
-    <div>
-      <strong>${act}</strong>
-      <p>Dimensión: ${d.name}</p>
-      <div class="aimeta">
-        <span class="at">Prioridad: ${prio}</span>
-      </div>
-    </div>
-  </div>`;
-});
+  // ── SCREEN: plan de accion — solo preguntas con score ≤ 2 (brecha real)
+  let ph='', n=0;
+  DIMS.forEach((d,di)=>{
+    d.qs.forEach((q,qi)=>{
+      const sc = qscores[di][qi];
+      if(sc > 2) return; // sin brecha: no aparece
+      n++;
+      const gap = 4 - sc;
+      const prio = gap >= 3 ? 'CRITICO' : gap >= 2 ? 'MEDIO' : 'BAJO';
+      const cls  = gap >= 3 ? 'pa' : gap >= 2 ? 'pm' : 'pb2';
+      const plazoTxt = gap >= 3 ? '0-30 dias' : gap >= 2 ? '1-3 meses' : '3-6 meses';
+      ph += `<div class="ai">
+        <div class="ap ${cls}">${n}</div>
+        <div>
+          <strong>${q.action}</strong>
+          <p>${d.name} · Criterio: "${q.t.slice(0,60)}..." · Score: ${sc}/4</p>
+          <div class="aimeta">
+            <span class="at">Prioridad: ${prio}</span>
+            <span class="at">${plazoTxt}</span>
+            <span class="at">KPI: ${q.kpi.k}</span>
+          </div>
+        </div>
+      </div>`;
+    });
   });
-  if(!ph) ph=`<p style="color:var(--muted);font-size:.875rem">Excelente nivel de madurez. Continua con el programa de mejora continua.</p>`;
+  if(!ph) ph=`<p style="color:var(--muted);font-size:.875rem;padding:.5rem 0">Excelente resultado: no se detectaron brechas con score 1 o 2. La organizacion se encuentra en nivel Implementado u Optimizado en todos los criterios evaluados.</p>`;
   document.getElementById('aplan').innerHTML=ph;
 
   // ── BUILD PDF PAGES ────────────────────────────────────────────────────────
@@ -679,7 +692,7 @@ function buildPDF(avg, mat, fecha, gaps){
   document.getElementById('pdf-f3').textContent=fdate;
   document.getElementById('pdf-f4').textContent=fdate;
 
-  // Radar para PDF (tema claro, sin animación, timeout mayor para garantizar render)
+  // Radar for PDF (light theme)
   setTimeout(()=>{
     if(chart2) chart2.destroy();
     const ctx2=document.getElementById('rc2');
@@ -726,10 +739,11 @@ function buildPDF(avg, mat, fecha, gaps){
     qh+=`<div class="pdf-qdim">
       <div class="pdf-qdim-title">${d.code} ${d.name} — Score: ${dsc.toFixed(1)}/4.0 · ${dm2.ti}</div>`;
     d.qs.forEach((q,qi)=>{
+      const qtext = typeof q === 'object' ? q.t : q;
       const qs=qscores[i][qi]||0, qm=getMat(qs);
       qh+=`<div class="pdf-qrow">
         <div class="pdf-qnum">${qi+1}.</div>
-        <div class="pdf-qtext">${q}</div>
+        <div class="pdf-qtext">${qtext}</div>
         <div class="pdf-qbar"><div class="pdf-qbarinner"><div class="pdf-qbarfill" style="width:${qs*25}%;background:${qm.co}"></div></div></div>
         <div class="pdf-qscore" style="color:${qm.co}">${qs}/4 ${SCALE.find(s=>s.n===qs)?.l||''}</div>
       </div>`;
@@ -738,101 +752,74 @@ function buildPDF(avg, mat, fecha, gaps){
   });
   document.getElementById('pdf-qdetail').innerHTML=qh;
 
-  // PAGE 4: ACTIONS + KPIs
+  // PAGE 4: PLAN DE ACCION + KPIs — solo preguntas con score ≤ 2
   let ah=''; let n2=0;
-  gaps.forEach(({d,sc,gap})=>{
-    // eliminar esta línea completamente
-    const acts=(ACTIONS[d.id]||[]).slice(0,3);
-    acts.forEach((act,ai)=>{
+  DIMS.forEach((d,di)=>{
+    d.qs.forEach((q,qi)=>{
+      const sc = qscores[di][qi];
+      if(sc > 2) return; // sin brecha: no aparece
       n2++;
-      const pc=gap>=2?'pdf-ai-crit':gap>=1?'pdf-ai-med':'pdf-ai-low';
-      const kpi=d.kpis[ai]||d.kpis[0];
+      const gap = 4 - sc;
+      const pc  = gap >= 3 ? 'pdf-ai-crit' : gap >= 2 ? 'pdf-ai-med' : 'pdf-ai-low';
+      const priL2 = gap >= 3 ? 'CRITICO' : gap >= 2 ? 'MEDIO' : 'BAJO';
+      const pl  = gap >= 3 ? '0-30 dias' : gap >= 2 ? '1-3 meses' : '3-6 meses';
       ah+=`<div class="pdf-action-item">
         <div class="pdf-ai-header">
           <div class="pdf-ai-num ${pc}">${n2}</div>
           <div>
-            <div class="pdf-ai-title">${act}</div>
-            <div class="pdf-ai-dim">${d.name} · Score actual: ${sc.toFixed(1)}/4.0 · GAP: ${gap.toFixed(1)} · Prioridad: ${priL(gap)} · Plazo: ${plazo(gap)}</div>
+            <div class="pdf-ai-title">${q.action}</div>
+            <div class="pdf-ai-dim">${d.name} · Score: ${sc}/4 · GAP: ${gap} · Prioridad: ${priL2} · Plazo: ${pl}</div>
           </div>
         </div>
         <div class="pdf-kpis">
-          <div class="pdf-kpi"><div class="pdf-kpi-lbl">KPI SUGERIDO</div><div class="pdf-kpi-val">${kpi.k}</div></div>
-          <div class="pdf-kpi"><div class="pdf-kpi-lbl">META REFERENCIA</div><div class="pdf-kpi-val">${kpi.meta}</div></div>
+          <div class="pdf-kpi"><div class="pdf-kpi-lbl">KPI ESPECIFICO</div><div class="pdf-kpi-val">${q.kpi.k}</div></div>
+          <div class="pdf-kpi"><div class="pdf-kpi-lbl">META DE REFERENCIA</div><div class="pdf-kpi-val">${q.kpi.meta}</div></div>
         </div>
       </div>`;
     });
   });
-  if(!ah) ah=`<p style="font-size:9px;color:#888">Excelente nivel. Enfocate en mejora continua y optimizacion de controles existentes.</p>`;
+  if(!ah) ah=`<p style="font-size:9px;color:#555;padding:4mm 0">No se detectaron brechas con score 1 o 2. La organizacion se encuentra en nivel Implementado u Optimizado en todos los criterios. Enfoque recomendado: mejora continua y optimizacion de controles existentes.</p>`;
   document.getElementById('pdf-actions').innerHTML=ah;
 
-  // KPIs globales por dimension
+  // KPIs globales — solo los de preguntas con brecha
   let kg='';
-  DIMS.forEach((d,i)=>{
-    const sc=scores[i], m2=getMat(sc);
+  let kgCount = 0;
+  DIMS.forEach((d,di)=>{
+    const brechas = d.qs.filter((_,qi) => qscores[di][qi] <= 2);
+    if(brechas.length === 0) return;
+    const sc=scores[di], m2=getMat(sc);
     kg+=`<div style="margin-bottom:4mm;break-inside:avoid">
-      <div style="font-family:var(--mono);font-size:8px;color:${m2.co};font-weight:500;margin-bottom:1.5mm;text-transform:uppercase">${d.code} ${d.name} (${sc.toFixed(1)}/4.0 · ${m2.ti})</div>
+      <div style="font-family:var(--mono);font-size:8px;color:${m2.co};font-weight:500;margin-bottom:1.5mm;text-transform:uppercase">${d.code} ${d.name} (${sc.toFixed(1)}/4.0 · ${m2.ti}) — ${brechas.length} brecha(s) detectada(s)</div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.5mm">`;
-    d.kpis.forEach(kpi=>{
-      kg+=`
-      <div class="pdf-kpi">
-        <div class="pdf-kpi-lbl">KPI DE CONTROL</div>
-        <div class="pdf-kpi-val" style="margin-bottom:1.5mm; min-height:7mm">${kpi.k}</div>
+    brechas.forEach(q=>{
+      kgCount++;
+      kg+=`<div class="pdf-kpi">
+        <div class="pdf-kpi-lbl">KPI · ${q.kpi.meta}</div>
+        <div class="pdf-kpi-val" style="margin-bottom:1.5mm">${q.kpi.k}</div>
         <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:7px;border-top:1px solid #ede8e0;padding-top:1.2mm">
-          <span style="color:#6B7180">SITUACIÓN ACTUAL: <strong style="color:#0B0F1A">[ ]</strong></span>
-          <span style="color:#C8923A;font-weight:500">META: ${kpi.meta}</span>
+          <span style="color:#6B7180">SITUACION ACTUAL: <strong style="color:#0B0F1A">[ ]</strong></span>
+          <span style="color:#C8923A;font-weight:500">META: ${q.kpi.meta}</span>
         </div>
       </div>`;
     });
     kg+=`</div></div>`;
   });
+  if(!kg) kg=`<p style="font-size:9px;color:#555">Sin brechas detectadas. Todos los criterios en nivel 3 o 4.</p>`;
   document.getElementById('pdf-kpis-global').innerHTML=kg;
 }
 
 
-// ── PRINT CON PLAN DE ACCIÓN ──────────────────────────────────────────────────
-function doPrint() {
-  // 1. Forzar visibilidad de todas las páginas PDF con inline !important
-  ['pdf-p1','pdf-p2','pdf-p3','pdf-p4'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.setProperty('display', 'block', 'important');
+// ── PRINT ─────────────────────────────────────────────────────────────────────
+function doPrint(){
+  ['pdf-p1','pdf-p2','pdf-p3','pdf-p4'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.setProperty('display','block','important');
   });
-
-  // 2. Verificar que pdf-actions tiene contenido (buildPDF ya lo llenó)
-  const pdfActions = document.getElementById('pdf-actions');
-  if (pdfActions && !pdfActions.innerHTML.trim()) {
-    // Fallback: construir desde el plan en pantalla si está vacío
-    const aplan = document.getElementById('aplan');
-    if (aplan) {
-      let pdfHTML = '';
-      aplan.querySelectorAll('.ai').forEach((item, idx) => {
-        const title = item.querySelector('strong')?.innerText || '';
-        const dimText = item.querySelector('p')?.innerText || '';
-        const prioSpan = item.querySelector('.at');
-        const prioText = prioSpan ? prioSpan.innerText : '';
-        const badgeClass = prioText.includes('CRÍTICO') || prioText.includes('CRITICO') ? 'pdf-ai-crit'
-                         : prioText.includes('MEDIO') ? 'pdf-ai-med' : 'pdf-ai-low';
-        pdfHTML += `<div class="pdf-action-item">
-          <div class="pdf-ai-header">
-            <div class="pdf-ai-num ${badgeClass}">${idx+1}</div>
-            <div>
-              <div class="pdf-ai-title">${title}</div>
-              <div class="pdf-ai-dim">${dimText} · ${prioText}</div>
-            </div>
-          </div>
-        </div>`;
-      });
-      pdfActions.innerHTML = pdfHTML || pdfActions.innerHTML;
-    }
-  }
-
-  // 3. Esperar a que el gráfico radar PDF (rc2) esté completamente renderizado
-  const waitAndPrint = () => {
-    const rc2 = document.getElementById('rc2');
-    const chartReady = rc2 && rc2.getContext && chart2 && chart2.data;
-    if (chartReady) {
-      setTimeout(() => window.print(), 300);
+  const waitAndPrint=()=>{
+    if(chart2 && chart2.data){
+      setTimeout(()=>window.print(),300);
     } else {
-      setTimeout(waitAndPrint, 200);
+      setTimeout(waitAndPrint,200);
     }
   };
   waitAndPrint();
@@ -840,16 +827,21 @@ function doPrint() {
 
 // ── ENVIO A GOOGLE SHEETS ─────────────────────────────────────────────────────
 async function sendData(avg, mat){
-  // Construir resumen de acciones top 3
-  const gaps=DIMS.map((d,i)=>({d,sc:scores[i],gap:4-scores[i]})).sort((a,b)=>b.gap-a.gap);
+  // Top 3 acciones: las 3 preguntas con mayor brecha (score ≤ 2)
   const topAcciones=[];
-  gaps.slice(0,3).forEach(({d,gap})=>{
-    if(gap<0.3) return;
-    topAcciones.push(`${d.name}(${priL(gap)}): ${(ACTIONS[d.id]||[])[0]||''}`);
+  DIMS.forEach((d,di)=>{
+    d.qs.forEach((q,qi)=>{
+      const sc=qscores[di][qi];
+      if(sc<=2) topAcciones.push({gap:4-sc, txt:`${d.name}(${4-sc>=3?'CRITICO':4-sc>=2?'MEDIO':'BAJO'}): ${q.action}`});
+    });
   });
+  topAcciones.sort((a,b)=>b.gap-a.gap);
+  const top3=topAcciones.slice(0,3).map(x=>x.txt);
 
-  const dimMasDebil=gaps[0]?.d?.name||'';
-  const dimMasFuerte=[...DIMS.map((d,i)=>({d,sc:scores[i]}))].sort((a,b)=>b.sc-a.sc)[0]?.d?.name||'';
+  const dimMasDebil=scores.indexOf(Math.min(...scores));
+  const dimMasFuerte=scores.indexOf(Math.max(...scores));
+  const dimDebilName=DIMS[dimMasDebil]?.name||'';
+  const dimFuerteName=DIMS[dimMasFuerte]?.name||'';
 
   const body={
     timestamp:new Date().toISOString(),
@@ -871,10 +863,10 @@ async function sendData(avg, mat){
       d.qs.map((_,qi)=>[`${d.id}_q${qi+1}`, qscores[di][qi]])
     )),
     // Inteligencia para el asesor
-    dim_mas_debil:dimMasDebil,
-    dim_mas_fuerte:dimMasFuerte,
-    gap_promedio:(gaps.reduce((s,g)=>s+g.gap,0)/gaps.length).toFixed(2),
-    top3_acciones:topAcciones.join(' | '),
+    dim_mas_debil:dimDebilName,
+    dim_mas_fuerte:dimFuerteName,
+    gap_promedio:(scores.reduce((s,v)=>s+(4-v),0)/scores.length).toFixed(2),
+    top3_acciones:top3.join(' | '),
     nivel_urgencia:avg<=2?'ALTA':avg<=3?'MEDIA':'BAJA',
     potencial_servicio:avg<=2?'Programa integral de control antifraude':
                        avg<=3?'Fortalecimiento de controles y capacitacion':'Optimizacion y mejora continua'
