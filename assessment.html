@@ -190,17 +190,39 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
   .pdf-footer{margin-top:6mm;padding-top:3mm;border-top:1px solid #e0d8cc;font-family:var(--mono);font-size:8px;color:#aaa;display:flex;justify-content:space-between}
 
 /* HIDE SCREEN ELEMENTS IN PDF */
-  #s2 .rgrid,#s2 .card-wide > .lbl,#s2 .card-wide > h2,#s2 .card-wide > div:last-child,
-  #s2 #aplan, #s2 #dscores, #s2 #rfecha,
-  #s2 > .card-wide > div[style*="justify-content:space-between"]{display:none!important}
-  .pdf-cover,.pdf-s1,.pdf-s2,.pdf-s3{display:block}
-}
+/* HIDE SCREEN ELEMENTS IN PDF */
+  #s2 .rgrid, 
+  #s2 .card-wide > .lbl, 
+  #s2 .card-wide > h2, 
+  #s2 .card-wide > div:last-child,
+  #s2 #dscores, 
+  #s2 #rfecha,
+  #s2 > .card-wide > div[style*="justify-content:space-between"] {
+    display: none !important;
+  }
 
-/* Fuerza a que el contenedor del PDF sea visible */
-#pdf-p4, #pdf-actions { display: block !important; opacity: 1 !important; visibility: visible !important; }
+  /* FORZAR VISIBILIDAD DE SECCIONES PDF */
+  .pdf-cover, .pdf-s1, .pdf-s2, .pdf-s3 {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* FORZAR SALTO DE PÁGINA PARA EL PLAN DE ACCIÓN */
+  #pdf-p4 {
+    page-break-before: always !important;
+    display: block !important;
+  }
+
+  /* ELIMINAMOS EL BLOQUEO DE #aplan SOLO PARA EL PDF */
+  #pdf-actions {
+    display: block !important;
+    min-height: 100px;
+  }
+} /* AQUÍ TERMINA EL @media print */
 
 /* ── Screen - hide pdf sections ──────────────────────────────────────── */
-.pdf-cover,.pdf-s1,.pdf-s2,.pdf-s3{display:none}
+.pdf-cover, .pdf-s1, .pdf-s2, .pdf-s3 { display: none; }
 
 /* ── RESPONSIVE ───────────────────────────────────────────────────────── */
 @media(max-width:620px){
@@ -782,31 +804,26 @@ function buildPDF(avg, mat, fecha, gaps){
 function doPrint() {
     const aplan = document.getElementById('aplan');
     const pdfActions = document.getElementById('pdf-actions');
+    const pdfP4 = document.getElementById('pdf-p4'); // Referencia a la página 4
 
     if (aplan && pdfActions) {
         let pdfHTML = '';
-        // 1. Buscamos todas las acciones generadas en la web
         const items = aplan.querySelectorAll('.ai');
 
         items.forEach((item) => {
-            // 2. Extraemos solo el texto limpio
             const num = item.querySelector('.ap').innerText;
             const title = item.querySelector('strong').innerText;
             const dimText = item.querySelector('p').innerText;
-            
-            // Buscamos la prioridad para asignarle color
             const prioSpan = item.querySelector('.at');
             const prioText = prioSpan ? prioSpan.innerText : '';
             
-            // 3. Asignamos el color nativo del PDF
-            let badgeClass = 'pdf-ai-low'; // Verde por defecto
+            let badgeClass = 'pdf-ai-low'; 
             if (prioText.includes('CRÍTICO') || prioText.includes('CRITICO')) {
-                badgeClass = 'pdf-ai-crit'; // Rojo
+                badgeClass = 'pdf-ai-crit'; 
             } else if (prioText.includes('MEDIO')) {
-                badgeClass = 'pdf-ai-med'; // Amarillo
+                badgeClass = 'pdf-ai-med'; 
             }
 
-            // 4. Construimos la estructura exacta que tu PDF necesita
             pdfHTML += `
             <div class="pdf-action-item">
                 <div class="pdf-ai-header">
@@ -819,14 +836,16 @@ function doPrint() {
             </div>`;
         });
 
-        // 5. Inyectamos el HTML perfecto en el contenedor del PDF
         pdfActions.innerHTML = pdfHTML;
+        
+        // FORZAR VISIBILIDAD: Asegura que el contenedor no esté oculto por CSS
+        if(pdfP4) pdfP4.style.display = 'block';
     }
 
-    // 6. Lanzamos la impresión
+    // Aumentamos a 1000ms para que el navegador "dibuje" la página 5 antes de imprimir
     setTimeout(() => {
         window.print();
-    }, 500);
+    }, 1000);
 }
 
 // ── ENVIO A GOOGLE SHEETS ─────────────────────────────────────────────────────
