@@ -388,6 +388,9 @@ p.sub{color:rgba(247,244,238,.55);font-size:.9rem;margin-bottom:1.5rem}
 // ── CONFIG ─────────────────────────────────────────────────────────────────
 const SHEETS_URL = "https://script.google.com/macros/s/AKfycbwakVdEvdqsZqWSNoQNnFfBmtobfYgqucGdchopogp0wED5BgI4mswDttlclZaQhA/exec";
 
+  // PEGA LA LÍNEA JUSTO AQUÍ:
+const estKPI = (s) => s < 2 ? "Deficiente (<40%)" : s < 3 ? "En proceso (40-75%)" : "Cerca de meta (>80%)";
+
 // ── DIMENSIONES ────────────────────────────────────────────────────────────
 const DIMS = [
   { id:"gov", code:"01", name:"Gobierno y Cultura Antifraude",
@@ -587,9 +590,23 @@ function finish(){
   // ── SCREEN: action plan
   const gaps=DIMS.map((d,i)=>({d,sc:scores[i],gap:4-scores[i]})).sort((a,b)=>b.gap-a.gap);
   let ph='',n=0;
-  gaps.slice(0,4).forEach(({d,sc,gap})=>{
-    if(gap<0.4) return;
-    (ACTIONS[d.id]||[]).slice(0,2).forEach(act=>{
+  // Tomamos las 6 dimensiones (slice 0,6) y quitamos el filtro de 0.4
+gaps.slice(0,6).forEach(({d,sc,gap})=>{
+  // Definimos la lógica de venta: si el gap es pequeño, es 'Optimización'
+  const prio = gap >= 1.5 ? 'CRÍTICO' : gap >= 0.7 ? 'MEDIO' : 'OPTIMIZACIÓN';
+  const cls = gap >= 1.5 ? 'pa' : gap >= 0.7 ? 'pm' : 'pb2';
+
+  (ACTIONS[d.id]||[]).slice(0,2).forEach(act=>{
+    n++;
+    // Esta parte llena la pantalla y prepara los datos para el PDF
+    ph += `<div class="ai">
+      <div class="ap ${cls}">${n}</div>
+      <div>
+        <strong>${act}</strong>
+        <p>Dimensión: ${d.name}</p>
+        <div class="aimeta"><span class="at">Prioridad: ${prio}</span></div>
+      </div>
+    </div>`;
       n++;
       ph+=`<div class="ai"><div class="ap ${priC(gap)}">${n}</div><div>
       <strong>${act}</strong>
@@ -742,7 +759,15 @@ function buildPDF(avg, mat, fecha, gaps){
       <div style="font-family:var(--mono);font-size:8px;color:${m2.co};font-weight:500;margin-bottom:1.5mm;text-transform:uppercase">${d.code} ${d.name} (${sc.toFixed(1)}/4.0 · ${m2.ti})</div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.5mm">`;
     d.kpis.forEach(kpi=>{
-      kg+=`<div class="pdf-kpi"><div class="pdf-kpi-lbl">KPI</div><div class="pdf-kpi-val">${kpi.k}</div><div style="font-size:7px;color:#C8923A;margin-top:.5mm">Meta: ${kpi.meta}</div></div>`;
+      kg+=`
+      <div class="pdf-kpi">
+        <div class="pdf-kpi-lbl">KPI DE CONTROL</div>
+        <div class="pdf-kpi-val" style="margin-bottom:1.5mm; min-height:7mm">${kpi.k}</div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:7px;border-top:1px solid #ede8e0;padding-top:1.2mm">
+          <span style="color:#6B7180">SITUACIÓN ACTUAL: <strong style="color:#0B0F1A">[ ]</strong></span>
+          <span style="color:#C8923A;font-weight:500">META: ${kpi.meta}</span>
+        </div>
+      </div>`;
     });
     kg+=`</div></div>`;
   });
