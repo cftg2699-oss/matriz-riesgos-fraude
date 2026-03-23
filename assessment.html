@@ -774,10 +774,27 @@ function buildPDF(avg, mat, fecha, gaps){
   document.getElementById('pdf-kpis-global').innerHTML=kg;
 }
 
+
 // ── PRINT ─────────────────────────────────────────────────────────────────────
 function doPrint(){
-  // CORRECCIÓN: Se aumenta el tiempo de espera de 400ms a 800ms para asegurar la renderización
-  setTimeout(()=>window.print(), 800);
+  // 1. Capturamos el plan de acción que ya se generó en la pantalla de resultados
+  const planHtml = document.getElementById('aplan').innerHTML;
+  
+  // 2. Lo inyectamos en el contenedor que el PDF usa en la página 4
+  const pdfContainer = document.getElementById('pdf-actions');
+  
+  if (pdfContainer) {
+    pdfContainer.innerHTML = planHtml;
+  }
+
+  // 3. Opcional: Si quieres que los KPIs también salgan con el estado que creamos
+  const kpisHtml = document.getElementById('pdf-kpis-global');
+  // (Aquí podrías añadir lógica similar si ves que los KPIs globales salen vacíos)
+
+  // 4. Lanzamos la impresión con un tiempo de espera para que el navegador procese el cambio
+  setTimeout(() => {
+    window.print();
+  }, 800);
 }
 
 // ── ENVIO A GOOGLE SHEETS ─────────────────────────────────────────────────────
