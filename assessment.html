@@ -646,7 +646,7 @@ function finish(){
   document.getElementById('aplan').innerHTML=ph;
 
   // ── BUILD PDF PAGES ────────────────────────────────────────────────────────
-  buildPDF(avg, mat, fecha, gaps);
+  buildPDF(avg, mat, fecha);
 
   showS(2);
   sendData(avg, mat);
@@ -671,7 +671,7 @@ function radarCfg(sc, canvasId){
   };
 }
 
-function buildPDF(avg, mat, fecha, gaps){
+function buildPDF(avg, mat, fecha){
   // PAGE 1: PORTADA
   document.getElementById('pc-score').textContent=avg.toFixed(1);
   document.getElementById('pc-score').style.color='#C8923A';
