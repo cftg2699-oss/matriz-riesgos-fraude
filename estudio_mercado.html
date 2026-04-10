@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudio de Mercado Antifraude · FraudEG</title>
+<meta name="description" content="Estudio de dolores y oportunidades en gestión de fraude. Para líderes y ejecutivos de control de fraude en Latinoamérica.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & VARS ─────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0B0F1A;--paper:#F7F4EE;--amber:#C8923A;--amber-l:#E8B870;
+  --slate:#1C2539;--muted:#6B7180;--line:rgba(200,146,58,.15);
+  --green:#2E6B4F;--red:#C04A3F;
+  --serif:'DM Serif Display',Georgia,serif;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;--r:8px;
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--paper);font-family:var(--sans);
+  font-size:16px;line-height:1.6;overflow-x:hidden;overflow-y:auto}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:64px 64px;pointer-events:none;z-index:0}
+
+/* ── PROGRESS ─────────────────────────────────────────────────────────── */
+.progress-bar{position:fixed;top:0;left:0;right:0;height:3px;
+  background:rgba(200,146,58,.15);z-index:100}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--amber-l));
+  transition:width .5s ease;width:0%}
+.progress-label{position:fixed;top:12px;right:20px;
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  letter-spacing:.08em;z-index:100}
+
+/* ── MAIN CONTAINER ───────────────────────────────────────────────────── */
+.survey{position:relative;z-index:1;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:3rem 1.5rem 2rem}
+
+/* ── SLIDES ───────────────────────────────────────────────────────────── */
+.slide{display:none;flex-direction:column;align-items:flex-start;
+  width:100%;max-width:680px;
+  animation:slideIn .35s ease both}
+.slide.active{display:flex}
+@keyframes slideIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-18px)}}
+.slide.leaving{animation:slideOut .25s ease both;display:flex}
+
+/* ── QUESTION NUMBER ──────────────────────────────────────────────────── */
+.q-num{font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+  color:var(--amber);margin-bottom:.6rem;
+  display:flex;align-items:center;gap:.5rem}
+.q-num::after{content:'→';font-size:14px}
+
+/* ── QUESTION TEXT ────────────────────────────────────────────────────── */
+.q-text{font-family:var(--serif);font-size:clamp(1.4rem,3vw,2rem);
+  line-height:1.2;margin-bottom:.4rem;color:var(--paper)}
+.q-text em{font-style:italic;color:var(--amber)}
+.q-hint{font-size:.85rem;color:var(--muted);margin-bottom:1.6rem;line-height:1.5}
+
+/* ── OPTIONS ──────────────────────────────────────────────────────────── */
+.options{display:flex;flex-direction:column;gap:.5rem;width:100%;margin-bottom:1.4rem}
+.opt{display:flex;align-items:center;gap:.9rem;
+  padding:.7rem 1rem;border-radius:var(--r);cursor:pointer;
+  border:1px solid rgba(200,146,58,.15);
+  background:rgba(28,37,57,.5);
+  transition:all .15s;user-select:none}
+.opt:hover{border-color:rgba(200,146,58,.45);background:rgba(28,37,57,.85)}
+.opt.selected{border-color:var(--amber);background:rgba(200,146,58,.12)}
+.opt-key{width:26px;height:26px;border-radius:4px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;font-weight:500;
+  border:1px solid rgba(200,146,58,.3);color:var(--amber);
+  background:rgba(11,15,26,.5);transition:all .15s}
+.opt.selected .opt-key{background:var(--amber);color:var(--ink);border-color:var(--amber)}
+.opt-label{font-size:.9rem;color:rgba(247,244,238,.85);line-height:1.4}
+.opt.selected .opt-label{color:var(--paper)}
+
+/* Multi-select hint */
+.multi-hint{font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+  color:rgba(200,146,58,.6);margin-bottom:.8rem}
+
+/* ── CHECKBOXES GRID (providers) ──────────────────────────────────────── */
+.options-grid{display:grid;grid-template-columns:1fr 1fr;
+  gap:.45rem;width:100%;margin-bottom:1.4rem}
+@media(max-width:520px){.options-grid{grid-template-columns:1fr}}
+
+/* ── TEXT INPUT ───────────────────────────────────────────────────────── */
+.open-wrap{width:100%;margin-bottom:1.4rem}
+.open-label{font-size:.8rem;letter-spacing:.06em;color:rgba(247,244,238,.5);
+  font-family:var(--mono);margin-bottom:.4rem;display:block}
+textarea,input[type=text]{width:100%;background:rgba(11,15,26,.6);
+  border:1px solid rgba(200,146,58,.22);border-radius:var(--r);
+  padding:.8rem 1rem;color:var(--paper);font-family:var(--sans);
+  font-size:.9rem;resize:none;outline:none;
+  transition:border-color .2s,box-shadow .2s}
+textarea:focus,input[type=text]:focus{border-color:var(--amber);
+  box-shadow:0 0 0 3px rgba(200,146,58,.1)}
+textarea{min-height:80px}
+
+/* ── CONDITIONAL ──────────────────────────────────────────────────────── */
+.conditional{display:none;margin-top:.6rem;width:100%}
+.conditional.visible{display:block}
+
+/* ── BUTTONS ──────────────────────────────────────────────────────────── */
+.actions{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.4rem;
+  font-family:var(--mono);font-size:13px;letter-spacing:.06em;
+  padding:.75rem 1.8rem;border-radius:var(--r);border:none;
+  cursor:pointer;transition:all .2s}
+.btn-p{background:var(--amber);color:var(--ink);font-weight:500;
+  box-shadow:0 4px 20px rgba(200,146,58,.2)}
+.btn-p:hover{background:var(--amber-l);transform:translateY(-1px)}
+.btn-p:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-skip{background:transparent;color:var(--muted);
+  border:1px solid rgba(247,244,238,.12);font-size:12px;padding:.65rem 1.2rem}
+.btn-skip:hover{color:var(--paper);border-color:rgba(247,244,238,.3)}
+.btn-back{background:transparent;color:var(--muted);
+  border:none;font-size:12px;padding:.65rem .5rem;cursor:pointer;
+  font-family:var(--mono);letter-spacing:.06em}
+.btn-back:hover{color:var(--paper)}
+.btn svg{width:14px;height:14px;flex-shrink:0}
+
+/* ── ERR ──────────────────────────────────────────────────────────────── */
+.err-msg{font-size:.78rem;color:#F08070;font-family:var(--mono);
+  margin-top:.3rem;display:none}
+
+/* ── INTRO SLIDE ──────────────────────────────────────────────────────── */
+.intro-badge{display:inline-flex;align-items:center;gap:.4rem;
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  color:var(--amber);border:1px solid rgba(200,146,58,.28);
+  padding:.22rem .7rem;border-radius:20px;margin-bottom:1.1rem}
+.intro-badge span{width:5px;height:5px;border-radius:50%;
+  background:var(--amber);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.intro-time{display:flex;align-items:center;gap:.5rem;
+  font-size:.82rem;color:var(--muted);margin-top:.8rem}
+.intro-time svg{width:14px;height:14px;color:var(--amber)}
+
+/* ── THANK YOU ────────────────────────────────────────────────────────── */
+.ty-icon{width:52px;height:52px;border-radius:50%;
+  background:rgba(46,107,79,.2);border:1px solid rgba(46,107,79,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;margin-bottom:1.2rem}
+.ty-sub{font-size:.9rem;color:var(--muted);margin-top:.5rem;max-width:480px;line-height:1.6}
+
+/* ── KEYBOARD HINT ────────────────────────────────────────────────────── */
+.kb-hint{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:10px;color:rgba(247,244,238,.2);
+  letter-spacing:.08em;pointer-events:none}
+
+/* ── TOAST ────────────────────────────────────────────────────────────── */
+.toast{position:fixed;bottom:2rem;right:2rem;
+  background:rgba(46,107,79,.92);color:#E2EFDA;
+  padding:.6rem 1rem;border-radius:var(--r);font-family:var(--mono);
+  font-size:11px;z-index:300;transform:translateY(60px);opacity:0;
+  transition:all .3s;border:1px solid rgba(46,107,79,.5)}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:600px){
+  .survey{padding:1.5rem 1.25rem}
+  .q-text{font-size:1.3rem}
+  .kb-hint{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+<div class="progress-label" id="progress-label"></div>
+
+<main class="survey" id="survey">
+
+  <!-- ══ INTRO ══════════════════════════════════════════════════════════ -->
+  <div class="slide active" id="slide-intro">
+    <div class="intro-badge"><span></span>ESTUDIO CONFIDENCIAL · FRAUDE EN LATAM</div>
+    <div class="q-text">Tu perspectiva como líder antifraude vale <em>mucho</em>.</div>
+    <p class="q-hint" style="max-width:520px">
+      Estamos mapeando los dolores reales del mercado. Son 10 preguntas, la mayoría de selección múltiple.
+      Tus respuestas son confidenciales y se usan solo para este estudio de mercado.
+    </p>
+    <div class="intro-time">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Menos de 4 minutos
+    </div>
+    <div class="actions" style="margin-top:1.6rem">
+      <button class="btn btn-p" onclick="startSurvey()">
+        EMPEZAR
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ Q1: CARGO ══════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-1" data-required="true">
+    <div class="q-num">PREGUNTA 1 DE 10</div>
+    <div class="q-text">¿Cuál describe mejor tu <em>rol</em>?</div>
+    <div class="options" id="opts-1">
+      <div class="opt" data-val="Director / VP de Fraude o Riesgos" onclick="selectSingle(1,this)">
+        <div class="opt-key">A</div><div class="opt-label">Director / VP de Fraude o Riesgos</div>
+      </div>
+      <div class="opt" data-val="Gerente de Prevención de Fraude" onclick="selectSingle(1,this)">
+        <div class="opt-key">B</div><div class="opt-label">Gerente de Prevención de Fraude</div>
+      </div>
+      <div class="opt" data-val="Gerente de Control Interno / Auditoría" onclick="selectSingle(1,this)">
+        <div class="opt-key">C</div><div class="opt-label">Gerente de Control Interno / Auditoría</div>
+      </div>
+      <div class="opt" data-val="CRO / CISO / C-Level" onclick="selectSingle(1,this)">
+        <div class="opt-key">D</div><div class="opt-label">CRO / CISO / C-Level</div>
+      </div>
+      <div class="opt" data-val="Analista o Especialista Antifraude" onclick="selectSingle(1,this)">
+        <div class="opt-key">E</div><div class="opt-label">Analista o Especialista Antifraude</div>
+      </div>
+      <div class="opt" data-val="Otro" onclick="selectSingle(1,this)">
+        <div class="opt-key">F</div><div class="opt-label">Otro</div>
+      </div>
+    </div>
+    <div class="err-msg" id="err-1">Por favor selecciona una opción</div>
+    <div class="actions"><button class="btn btn-p" onclick="nextSlide(1)">CONTINUAR →</button></div>
+  </div>
+
+  <!-- ══ Q2: SECTOR ═════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-2" data-required="true">
+    <div class="q-num">PREGUNTA 2 DE 10</div>
+    <div class="q-text">¿En qué <em>sector</em> opera tu organización?</div>
+    <div class="options" id="opts-2">
+      <div class="opt" data-val="Banca / Financiero" onclick="selectSingle(2,this)">
+        <div class="opt-key">A</div><div class="opt-label">Banca / Financiero</div>
+      </div>
+      <div class="opt" data-val="Fintech / Pagos digitales" onclick="selectSingle(2,this)">
+        <div class="opt-key">B</div><div class="opt-label">Fintech / Pagos digitales</div>
+      </div>
+      <div class="opt" data-val="Seguros" onclick="selectSingle(2,this)">
+        <div class="opt-key">C</div><div class="opt-label">Seguros</div>
+      </div>
+      <div class="opt" data-val="E-commerce / Retail" onclick="selectSingle(2,this)">
+        <div class="opt-key">D</div><div class="opt-label">E-commerce / Retail</div>
+      </div>
+      <div class="opt" data-val="Telco / Medios" onclick="selectSingle(2,this)">
+        <div class="opt-key">E</div><div class="opt-label">Telco / Medios</div>
+      </div>
+      <div class="opt" data-val="Gobierno / Sector público" onclick="selectSingle(2,this)">
+        <div class="opt-key">F</div><div class="opt-label">Gobierno / Sector público</div>
+      </div>
+      <div class="opt" data-val="Otro" onclick="selectSingle(2,this)">
+        <div class="opt-key">G</div><div class="opt-label">Otro</div>
+      </div>
+    </div>
+    <div class="err-msg" id="err-2">Por favor selecciona una opción</div>
+    <div class="actions">
+      <button class="btn btn-p" onclick="nextSlide(2)">CONTINUAR →</button>
+      <button class="btn-back" onclick="prevSlide(2)">← Atrás</button>
+    </div>
+  </div>
+
+  <!-- ══ Q3: DOLOR PRINCIPAL ════════════════════════════════════════════ -->
+  <div class="slide" id="slide-3" data-required="true">
+    <div class="q-num">PREGUNTA 3 DE 10</div>
+    <div class="q-text">¿Cuál es el <em>mayor dolor</em> que enfrenta tu equipo hoy?</div>
+    <p class="q-hint">Elige hasta 3 opciones. Sé honesto — esto es anónimo.</p>
+    <div class="multi-hint">SELECCIÓN MÚLTIPLE — elige hasta 3</div>
+    <div class="options" id="opts-3">
+      <div class="opt" data-val="Saturación operativa — demasiado volumen de alertas para revisar manualmente" onclick="selectMulti(3,this,3)">
+        <div class="opt-key">A</div><div class="opt-label">Saturación operativa — demasiado volumen de alertas para revisar manualmente</div>
+      </div>
+      <div class="opt" data-val="Detección tardía — el fraude ya se consumó cuando lo identificamos" onclick="selectMulti(3,this,3)">
+        <div class="opt-key">B</div><div class="opt-label">Detección tardía — el fraude ya se consumó cuando lo identificamos</div>
+      </div>
+      <div class="opt" data-val="Falsos positivos elevados — bloqueamos clientes legítimos y perdemos conversión" onclick="selectMulti(3,this,3)">
+        <div class="opt-key">C</div><div class="opt-label">Falsos positivos elevados — bloqueamos clientes legítimos y perdemos conversión</div>
+      </div>
+      <div class="opt" data-val="Modelos estáticos — las reglas no se adaptan a nuevos vectores de ataque" onclick="selectMulti(3,this,3)">
+        <div class="opt-key">D</div><div class="opt-label">Modelos estáticos — las reglas no se adaptan a nuevos vectores de ataque</div>
+      </div>
+      <div class="opt" data-val="Falta de visibilidad ejecutiva — no tenemos métricas claras para reportar a dirección" onclick="selectMulti(3,this,3)">
+        <div class="opt-key">E</div><div class="opt-label">Falta de visibilidad ejecutiva — no tenemos métricas claras para reportar a dirección</div>
+      </div>
+      <div class="opt" data-val="Dependencia de TI — cualquier ajuste al sistema requiere meses de desarrollo" onclick="selectMulti(3,this,3)">
+        <div class="opt-key">F</div><div class="opt-label">Dependencia de TI — cualquier ajuste al sistema requiere meses de desarrollo</div>
+      </div>
+      <div class="opt" data-val="Fraude interno — empleados o colaboradores con acceso privilegiado" onclick="selectMulti(3,this,3)">
+        <div class="opt-key">G</div><div class="opt-label">Fraude interno — empleados o colaboradores con acceso privilegiado</div>
+      </div>
+      <div class="opt" data-val="Identidad sintética y deepfakes — no podemos verificar quién es realmente el cliente" onclick="selectMulti(3,this,3)">
+        <div class="opt-key">H</div><div class="opt-label">Identidad sintética y deepfakes — no podemos verificar quién es realmente el cliente</div>
+      </div>
+      <div class="opt" data-val="Ingeniería social — los clientes son manipulados para autorizar transferencias fraudulentas" onclick="selectMulti(3,this,3)">
+        <div class="opt-key">I</div><div class="opt-label">Ingeniería social — los clientes son manipulados para autorizar transferencias fraudulentas</div>
+      </div>
+      <div class="opt" data-val="Silos de datos — no podemos cruzar señales entre canales para tener visión completa del riesgo" onclick="selectMulti(3,this,3)">
+        <div class="opt-key">J</div><div class="opt-label">Silos de datos — no podemos cruzar señales entre canales para tener visión completa del riesgo</div>
+      </div>
+    </div>
+    <div class="err-msg" id="err-3">Por favor selecciona al menos una opción</div>
+    <div class="actions">
+      <button class="btn btn-p" onclick="nextSlide(3)">CONTINUAR →</button>
+      <button class="btn-back" onclick="prevSlide(3)">← Atrás</button>
+    </div>
+  </div>
+
+  <!-- ══ Q4: URGENCIA ═══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-4" data-required="true">
+    <div class="q-num">PREGUNTA 4 DE 10</div>
+    <div class="q-text">¿Qué tan <em>urgente</em> es resolver el fraude en tu organización hoy?</div>
+    <div class="options" id="opts-4">
+      <div class="opt" data-val="Crítico — es prioridad número 1 ahora mismo" onclick="selectSingle(4,this)">
+        <div class="opt-key">A</div><div class="opt-label">🔴 Crítico — es prioridad número 1 ahora mismo</div>
+      </div>
+      <div class="opt" data-val="Alto — está en agenda pero hay otras urgencias también" onclick="selectSingle(4,this)">
+        <div class="opt-key">B</div><div class="opt-label">🟠 Alto — está en agenda pero hay otras urgencias también</div>
+      </div>
+      <div class="opt" data-val="Medio — importante pero no hay presión inmediata" onclick="selectSingle(4,this)">
+        <div class="opt-key">C</div><div class="opt-label">🟡 Medio — importante pero no hay presión inmediata</div>
+      </div>
+      <div class="opt" data-val="Bajo — está controlado por ahora" onclick="selectSingle(4,this)">
+        <div class="opt-key">D</div><div class="opt-label">🟢 Bajo — está controlado por ahora</div>
+      </div>
+    </div>
+    <div class="err-msg" id="err-4">Por favor selecciona una opción</div>
+    <div class="actions">
+      <button class="btn btn-p" onclick="nextSlide(4)">CONTINUAR →</button>
+      <button class="btn-back" onclick="prevSlide(4)">← Atrás</button>
+    </div>
+  </div>
+
+  <!-- ══ Q5: PROVEEDOR ACTUAL ═══════════════════════════════════════════ -->
+  <div class="slide" id="slide-5" data-required="false">
+    <div class="q-num">PREGUNTA 5 DE 10</div>
+    <div class="q-text">¿Qué soluciones o <em>proveedores</em> usan actualmente?</div>
+    <p class="q-hint">Marca todos los que apliquen. Si usas algo no listado, escríbelo al final.</p>
+    <div class="multi-hint">SELECCIÓN MÚLTIPLE — marca todos los que apliquen</div>
+    <div class="options-grid" id="opts-5">
+      <!-- Globales líderes -->
+      <div class="opt" data-val="FICO Falcon Fraud Manager" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">FICO Falcon Fraud Manager</div>
+      </div>
+      <div class="opt" data-val="SAS Fraud Management" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">SAS Fraud Management</div>
+      </div>
+      <div class="opt" data-val="NICE Actimize" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">NICE Actimize</div>
+      </div>
+      <div class="opt" data-val="IBM Trusteer" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">IBM Trusteer</div>
+      </div>
+      <div class="opt" data-val="Oracle Financial Crime / OFSAA" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Oracle Financial Crime / OFSAA</div>
+      </div>
+      <div class="opt" data-val="ACI Fraud Management" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">ACI Fraud Management</div>
+      </div>
+      <!-- Biométrica y comportamiento -->
+      <div class="opt" data-val="BioCatch (biométrica conductual)" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">BioCatch (biométrica conductual)</div>
+      </div>
+      <div class="opt" data-val="Monitor Plus" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Monitor Plus</div>
+      </div>
+      <!-- Identidad y verificación -->
+      <div class="opt" data-val="LexisNexis ThreatMetrix / TruValidate" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">LexisNexis ThreatMetrix / TruValidate</div>
+      </div>
+      <div class="opt" data-val="Experian CrossCore / Hunter" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Experian CrossCore / Hunter</div>
+      </div>
+      <div class="opt" data-val="Equifax Kount" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Equifax / Kount</div>
+      </div>
+      <div class="opt" data-val="Socure" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Socure</div>
+      </div>
+      <div class="opt" data-val="Sumsub" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Sumsub</div>
+      </div>
+      <!-- Redes de pago -->
+      <div class="opt" data-val="Visa Advanced Authorization / DPS" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Visa Advanced Authorization / DPS</div>
+      </div>
+      <div class="opt" data-val="Mastercard Decision Intelligence / Ethoca" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Mastercard Decision Intelligence / Ethoca</div>
+      </div>
+      <!-- ML y decisioning -->
+      <div class="opt" data-val="Feedzai" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Feedzai</div>
+      </div>
+      <div class="opt" data-val="FeatureSpace (ARIC)" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">FeatureSpace (ARIC)</div>
+      </div>
+      <div class="opt" data-val="Provenir" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Provenir</div>
+      </div>
+      <div class="opt" data-val="SEON" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">SEON</div>
+      </div>
+      <div class="opt" data-val="Sardine AI" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Sardine AI</div>
+      </div>
+      <div class="opt" data-val="Nethone / Mangopay" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Nethone / Mangopay</div>
+      </div>
+      <!-- LATAM / regionales -->
+      <div class="opt" data-val="iuvity / iuviPROFILER" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">iuvity / iuviPROFILER</div>
+      </div>
+      <div class="opt" data-val="Sentinel (solución regional)" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Sentinel</div>
+      </div>
+      <div class="opt" data-val="Temenos Financial Crime Mitigation" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Temenos Financial Crime Mitigation</div>
+      </div>
+      <div class="opt" data-val="Fiserv CardGuard / Fraud Risk Manager" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Fiserv CardGuard / Fraud Risk Manager</div>
+      </div>
+      <div class="opt" data-val="BAE Systems NetReveal" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">BAE Systems NetReveal</div>
+      </div>
+      <div class="opt" data-val="Veritran" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Veritran</div>
+      </div>
+      <!-- Sin solución formal -->
+      <div class="opt" data-val="Desarrollo propio / In-house" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Desarrollo propio / In-house</div>
+      </div>
+      <div class="opt" data-val="Solo reglas manuales / Motor de reglas básico" onclick="selectMulti(5,this,99)">
+        <div class="opt-key" style="font-size:10px">◉</div><div class="opt-label">Solo reglas manuales / Motor de reglas básico</div>
+      </div>
+    </div>
+    <div class="open-wrap" style="margin-top:.6rem">
+      <label class="open-label">¿Otro proveedor no listado?</label>
+      <input type="text" id="q5-other" placeholder="Escribe el nombre aquí...">
+    </div>
+    <div class="actions">
+      <button class="btn btn-p" onclick="nextSlide(5)">CONTINUAR →</button>
+      <button class="btn-skip" onclick="skipSlide(5)">Prefiero no responder</button>
+      <button class="btn-back" onclick="prevSlide(5)">← Atrás</button>
+    </div>
+  </div>
+
+  <!-- ══ Q6: SATISFACCION PROVEEDOR ════════════════════════════════════ -->
+  <div class="slide" id="slide-6" data-required="true">
+    <div class="q-num">PREGUNTA 6 DE 10</div>
+    <div class="q-text">¿Qué tan <em>satisfecho</em> estás con tu solución actual?</div>
+    <div class="options" id="opts-6">
+      <div class="opt" data-val="Muy satisfecho — cubre casi todo lo que necesitamos" onclick="selectSingle(6,this)">
+        <div class="opt-key">A</div><div class="opt-label">Muy satisfecho — cubre casi todo lo que necesitamos</div>
+      </div>
+      <div class="opt" data-val="Satisfecho, pero hay brechas importantes" onclick="selectSingle(6,this)">
+        <div class="opt-key">B</div><div class="opt-label">Satisfecho, pero hay brechas importantes</div>
+      </div>
+      <div class="opt" data-val="Regular — funciona pero deja mucho que desear" onclick="selectSingle(6,this)">
+        <div class="opt-key">C</div><div class="opt-label">Regular — funciona pero deja mucho que desear</div>
+      </div>
+      <div class="opt" data-val="Insatisfecho — buscamos activamente alternativas" onclick="selectSingle(6,this)">
+        <div class="opt-key">D</div><div class="opt-label">Insatisfecho — buscamos activamente alternativas</div>
+      </div>
+      <div class="opt" data-val="No tenemos solución formal todavía" onclick="selectSingle(6,this)">
+        <div class="opt-key">E</div><div class="opt-label">No tenemos solución formal todavía</div>
+      </div>
+    </div>
+    <div class="err-msg" id="err-6">Por favor selecciona una opción</div>
+    <div class="actions">
+      <button class="btn btn-p" onclick="nextSlide(6)">CONTINUAR →</button>
+      <button class="btn-back" onclick="prevSlide(6)">← Atrás</button>
+    </div>
+  </div>
+
+  <!-- ══ Q7: CAMBIO DE PROVEEDOR ════════════════════════════════════════ -->
+  <div class="slide" id="slide-7" data-required="true">
+    <div class="q-num">PREGUNTA 7 DE 10</div>
+    <div class="q-text">¿Considerarías <em>cambiar</em> tu proveedor actual?</div>
+    <div class="options" id="opts-7">
+      <div class="opt" data-val="Sí — estamos evaluando opciones activamente" onclick="selectSingle(7,this)">
+        <div class="opt-key">A</div><div class="opt-label">Sí — estamos evaluando opciones activamente</div>
+      </div>
+      <div class="opt" data-val="Tal vez — dependería de qué ofrece la alternativa" onclick="selectSingle(7,this)" id="opt-talmez">
+        <div class="opt-key">B</div><div class="opt-label">Tal vez — dependería de qué ofrece la alternativa</div>
+      </div>
+      <div class="opt" data-val="No — estamos comprometidos con el proveedor actual" onclick="selectSingle(7,this)">
+        <div class="opt-key">C</div><div class="opt-label">No — estamos comprometidos con el proveedor actual</div>
+      </div>
+    </div>
+    <!-- Conditional: Tal vez -->
+    <div class="conditional" id="cond-7">
+      <div class="open-wrap">
+        <label class="open-label">¿Qué tendría que ofrecer la alternativa para que lo consideraras?</label>
+        <textarea id="q7-reason" placeholder="Ej: mejor precio, detección en tiempo real, integración más sencilla..."></textarea>
+      </div>
+    </div>
+    <div class="err-msg" id="err-7">Por favor selecciona una opción</div>
+    <div class="actions">
+      <button class="btn btn-p" onclick="nextSlide(7)">CONTINUAR →</button>
+      <button class="btn-back" onclick="prevSlide(7)">← Atrás</button>
+    </div>
+  </div>
+
+  <!-- ══ Q8: LO QUE FALTA ═══════════════════════════════════════════════ -->
+  <div class="slide" id="slide-8" data-required="true">
+    <div class="q-num">PREGUNTA 8 DE 10</div>
+    <div class="q-text">¿Qué es lo que <em>ninguna solución actual</em> te da y más necesitas?</div>
+    <p class="q-hint">Elige hasta 3 opciones. Esto nos ayuda a entender dónde están las brechas reales del mercado.</p>
+    <div class="multi-hint">SELECCIÓN MÚLTIPLE — elige hasta 3</div>
+    <div class="options" id="opts-8">
+      <div class="opt" data-val="Velocidad de respuesta — detección y bloqueo antes de que el fraude se complete" onclick="selectMulti(8,this,3)">
+        <div class="opt-key">A</div><div class="opt-label">Velocidad de respuesta — detección y bloqueo antes de que el fraude se complete</div>
+      </div>
+      <div class="opt" data-val="Autonomía del negocio — poder ajustar modelos y reglas sin depender de TI ni del proveedor" onclick="selectMulti(8,this,3)">
+        <div class="opt-key">B</div><div class="opt-label">Autonomía del negocio — poder ajustar modelos sin depender de TI ni del proveedor</div>
+      </div>
+      <div class="opt" data-val="Precisión real — menos ruido, más señal; alertas que realmente merecen investigarse" onclick="selectMulti(8,this,3)">
+        <div class="opt-key">C</div><div class="opt-label">Precisión real — menos ruido, más señal; alertas que realmente merecen investigarse</div>
+      </div>
+      <div class="opt" data-val="Visión 360° del cliente — cruzar señales de todos los canales en tiempo real" onclick="selectMulti(8,this,3)">
+        <div class="opt-key">D</div><div class="opt-label">Visión 360° del cliente — cruzar señales de todos los canales en tiempo real</div>
+      </div>
+      <div class="opt" data-val="Detección de identidad sintética y fraude de onboarding desde el primer contacto" onclick="selectMulti(8,this,3)">
+        <div class="opt-key">E</div><div class="opt-label">Detección de identidad sintética y fraude de onboarding desde el primer contacto</div>
+      </div>
+      <div class="opt" data-val="Explicabilidad — entender por qué el modelo tomó una decisión para justificarla ante el cliente" onclick="selectMulti(8,this,3)">
+        <div class="opt-key">F</div><div class="opt-label">Explicabilidad — entender por qué el modelo tomó una decisión para justificarla</div>
+      </div>
+      <div class="opt" data-val="Dashboard ejecutivo con ROI claro del programa antifraude para reportar a dirección" onclick="selectMulti(8,this,3)">
+        <div class="opt-key">G</div><div class="opt-label">Dashboard ejecutivo con ROI claro del programa antifraude para reportar a dirección</div>
+      </div>
+      <div class="opt" data-val="Integración nativa con mis sistemas actuales sin grandes proyectos de TI" onclick="selectMulti(8,this,3)">
+        <div class="opt-key">H</div><div class="opt-label">Integración nativa con mis sistemas actuales sin grandes proyectos de TI</div>
+      </div>
+      <div class="opt" data-val="Protección contra fraude en pagos en tiempo real (PIX, transferencias inmediatas, wallets)" onclick="selectMulti(8,this,3)">
+        <div class="opt-key">I</div><div class="opt-label">Protección contra fraude en pagos en tiempo real (PIX, transferencias inmediatas, wallets)</div>
+      </div>
+      <div class="opt" data-val="Soporte local en LATAM con conocimiento del mercado regional — no solo soporte global genérico" onclick="selectMulti(8,this,3)">
+        <div class="opt-key">J</div><div class="opt-label">Soporte local en LATAM con conocimiento del mercado regional</div>
+      </div>
+    </div>
+    <div class="err-msg" id="err-8">Por favor selecciona al menos una opción</div>
+    <div class="actions">
+      <button class="btn btn-p" onclick="nextSlide(8)">CONTINUAR →</button>
+      <button class="btn-back" onclick="prevSlide(8)">← Atrás</button>
+    </div>
+  </div>
+
+  <!-- ══ Q9: PRESUPUESTO ════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-9" data-required="false">
+    <div class="q-num">PREGUNTA 9 DE 10</div>
+    <div class="q-text">¿Existe presupuesto disponible para una nueva <em>solución antifraude</em> este año?</div>
+    <div class="options" id="opts-9">
+      <div class="opt" data-val="Sí, tenemos presupuesto asignado" onclick="selectSingle(9,this)">
+        <div class="opt-key">A</div><div class="opt-label">Sí, tenemos presupuesto asignado</div>
+      </div>
+      <div class="opt" data-val="Podría justificarse si el ROI es claro" onclick="selectSingle(9,this)">
+        <div class="opt-key">B</div><div class="opt-label">Podría justificarse si el ROI es claro</div>
+      </div>
+      <div class="opt" data-val="No hay presupuesto disponible este año" onclick="selectSingle(9,this)">
+        <div class="opt-key">C</div><div class="opt-label">No hay presupuesto disponible este año</div>
+      </div>
+      <div class="opt" data-val="No puedo compartir esta información" onclick="selectSingle(9,this)">
+        <div class="opt-key">D</div><div class="opt-label">Prefiero no responder esto</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-p" onclick="nextSlide(9)">CONTINUAR →</button>
+      <button class="btn-skip" onclick="skipSlide(9)">Saltar esta pregunta</button>
+      <button class="btn-back" onclick="prevSlide(9)">← Atrás</button>
+    </div>
+  </div>
+
+  <!-- ══ Q10: CONTACTO ══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-10" data-required="true">
+    <div class="q-num">PREGUNTA 10 DE 10</div>
+    <div class="q-text">¿A dónde enviamos el <em>resumen del estudio</em> cuando esté listo?</div>
+    <p class="q-hint">Te enviaremos los resultados agregados del mercado. Sin spam ni seguimiento comercial sin tu consentimiento.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:.8rem;width:100%">
+      <div class="open-wrap" style="margin-bottom:0">
+        <label class="open-label">NOMBRE *</label>
+        <input type="text" id="q10-nombre" placeholder="Tu nombre">
+      </div>
+      <div class="open-wrap" style="margin-bottom:0">
+        <label class="open-label">EMPRESA</label>
+        <input type="text" id="q10-empresa" placeholder="Tu organización">
+      </div>
+    </div>
+    <div class="open-wrap">
+      <label class="open-label">CORREO ELECTRÓNICO *</label>
+      <input type="email" id="q10-email" placeholder="tu@empresa.com">
+    </div>
+    <div class="open-wrap">
+      <label class="open-label">PAÍS</label>
+      <input type="text" id="q10-pais" placeholder="Ej: México, Colombia, Ecuador...">
+    </div>
+    <p style="font-size:.75rem;color:rgba(247,244,238,.3);margin-top:.2rem;font-family:var(--mono)">
+      Datos confidenciales. Usados únicamente para este estudio de mercado.
+    </p>
+    <div class="err-msg" id="err-10">Por favor ingresa tu nombre y correo</div>
+    <div class="actions" style="margin-top:1rem">
+      <button class="btn btn-p" onclick="submitSurvey()">
+        ENVIAR RESPUESTAS
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4z"/></svg>
+      </button>
+      <button class="btn-back" onclick="prevSlide(10)">← Atrás</button>
+    </div>
+  </div>
+
+  <!-- ══ THANK YOU ══════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-ty">
+    <div class="ty-icon">✓</div>
+    <div class="q-text">¡Gracias por tu tiempo y <em>confianza</em>!</div>
+    <p class="ty-sub">
+      Tus respuestas son muy valiosas para mapear los dolores reales del mercado antifraude en Latinoamérica.
+      Te enviaremos un resumen de los resultados del estudio cuando esté listo.
+    </p>
+    <p class="ty-sub" style="margin-top:.8rem;font-family:var(--mono);font-size:.8rem;color:rgba(200,146,58,.7)">
+      — Equipo FraudEG
+    </p>
+  </div>
+
+</main>
+
+<div class="kb-hint">Presiona ENTER para continuar</div>
+<div class="toast" id="toast">Respuestas enviadas</div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────────────────
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbwliXIxVxChMnLetWphUX1AjMiR6XR8lWo2ILYAIuCZ8yluD_tpOkHB8HpJwL0ucAn5/exec";
+
+const TOTAL = 10;
+let current = 0; // 0 = intro
+const answers = {};
+
+// ── NAV ─────────────────────────────────────────────────────────────────────
+function startSurvey(){ goTo(1); }
+
+function goTo(n){
+  const from = current === 0 ? 'intro' : current;
+  const fromEl = document.getElementById(`slide-${from}`);
+  const toEl   = document.getElementById(`slide-${n === 'ty' ? 'ty' : n}`);
+  if(!toEl) return;
+  if(fromEl){
+    fromEl.classList.add('leaving');
+    setTimeout(()=>{ fromEl.classList.remove('active','leaving'); },250);
+  }
+  setTimeout(()=>{
+    toEl.classList.add('active');
+    current = n;
+    updateProgress();
+  },200);
+}
+
+function nextSlide(n){
+  const required = document.getElementById(`slide-${n}`)?.dataset?.required === 'true';
+  if(required && !hasAnswer(n)){
+    document.getElementById(`err-${n}`)?.style && (document.getElementById(`err-${n}`).style.display='block');
+    return;
+  }
+  if(document.getElementById(`err-${n}`)) document.getElementById(`err-${n}`).style.display='none';
+  if(n < TOTAL) goTo(n+1);
+}
+
+function prevSlide(n){ if(n > 1) goTo(n-1); else goTo(0); }
+
+function skipSlide(n){
+  answers[`q${n}`] = 'SKIPPED';
+  if(n < TOTAL) goTo(n+1);
+}
+
+function hasAnswer(n){
+  if(n === 10){
+    const nombre = document.getElementById('q10-nombre')?.value?.trim();
+    const email  = document.getElementById('q10-email')?.value?.trim();
+    return nombre && email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+  const a = answers[`q${n}`];
+  return a && (Array.isArray(a) ? a.length > 0 : a !== '');
+}
+
+// ── PROGRESS ────────────────────────────────────────────────────────────────
+function updateProgress(){
+  if(current === 0 || current === 'ty'){
+    document.getElementById('progress-fill').style.width = current === 'ty' ? '100%' : '0%';
+    document.getElementById('progress-label').textContent = current === 'ty' ? '' : '';
+    return;
+  }
+  const pct = Math.round((current / TOTAL) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${current} / ${TOTAL}`;
+}
+
+// ── SELECTION ───────────────────────────────────────────────────────────────
+function selectSingle(n, el){
+  document.querySelectorAll(`#opts-${n} .opt`).forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[`q${n}`] = el.dataset.val;
+  if(document.getElementById(`err-${n}`)) document.getElementById(`err-${n}`).style.display='none';
+
+  // Conditional logic Q7
+  if(n === 7){
+    const cond = document.getElementById('cond-7');
+    if(el.dataset.val.startsWith('Tal vez')){
+      cond.classList.add('visible');
+    } else {
+      cond.classList.remove('visible');
+      if(document.getElementById('q7-reason')) document.getElementById('q7-reason').value='';
+    }
+  }
+
+  // Auto-advance for single-select (small delay for visual feedback)
+  // Exception: Q7 "Tal vez" requires open text before advancing
+  if(n === 7 && el.dataset.val.startsWith('Tal vez')) return;
+  setTimeout(() => nextSlide(n), 350);
+}
+
+function selectMulti(n, el, max){
+  const selected = document.querySelectorAll(`#opts-${n} .opt.selected`);
+  if(el.classList.contains('selected')){
+    el.classList.remove('selected');
+    const vals = answers[`q${n}`] || [];
+    answers[`q${n}`] = vals.filter(v => v !== el.dataset.val);
+  } else {
+    if(selected.length >= max){
+      // Deselect first selected
+      selected[0].classList.remove('selected');
+      const vals = answers[`q${n}`] || [];
+      answers[`q${n}`] = vals.filter(v => v !== selected[0].dataset.val);
+    }
+    el.classList.add('selected');
+    if(!answers[`q${n}`]) answers[`q${n}`] = [];
+    answers[`q${n}`].push(el.dataset.val);
+  }
+  if(document.getElementById(`err-${n}`)) document.getElementById(`err-${n}`).style.display='none';
+}
+
+// ── KEYBOARD ────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && current !== 0 && current !== 'ty'){
+    if(current === 10) { submitSurvey(); return; }
+    nextSlide(current);
+  }
+  // Letter shortcuts for single-select
+  if(current !== 0 && current !== 'ty' && current !== 10){
+    const keyMap = {'a':0,'b':1,'c':2,'d':3,'e':4,'f':5,'g':6};
+    const idx = keyMap[e.key.toLowerCase()];
+    if(idx !== undefined){
+      const opts = document.querySelectorAll(`#opts-${current} .opt`);
+      if(opts[idx]){
+        const isMulti = opts[idx].getAttribute('onclick')?.includes('selectMulti');
+        if(isMulti) selectMulti(current, opts[idx], 2);
+        else selectSingle(current, opts[idx]);
+      }
+    }
+  }
+});
+
+// ── SUBMIT ──────────────────────────────────────────────────────────────────
+async function submitSurvey(){
+  if(!hasAnswer(10)){
+    document.getElementById('err-10').style.display='block';
+    return;
+  }
+  // Collect contact info
+  const nombre  = document.getElementById('q10-nombre').value.trim();
+  const empresa = document.getElementById('q10-empresa').value.trim();
+  const email   = document.getElementById('q10-email').value.trim();
+  const pais    = document.getElementById('q10-pais').value.trim();
+
+  // Collect q5 other
+  const q5other = document.getElementById('q5-other')?.value?.trim() || '';
+  const q7reason = document.getElementById('q7-reason')?.value?.trim() || '';
+
+  const proveedores = [
+    ...(Array.isArray(answers.q5) ? answers.q5 : (answers.q5 ? [answers.q5] : [])),
+    ...(q5other ? [`Otro: ${q5other}`] : [])
+  ].join(' | ');
+
+  const payload = {
+    sheet: "Estudio_Mercado",
+    timestamp: new Date().toISOString(),
+    nombre, empresa, email, pais,
+    q1_rol:            answers.q1 || '',
+    q2_sector:         answers.q2 || '',
+    q3_dolor:          Array.isArray(answers.q3) ? answers.q3.join(' | ') : (answers.q3 || ''),
+    q4_urgencia:       answers.q4 || '',
+    q5_proveedores:    proveedores,
+    q6_satisfaccion:   answers.q6 || '',
+    q7_cambio:         answers.q7 || '',
+    q7_razon_cambio:   q7reason,
+    q8_necesidad:      Array.isArray(answers.q8) ? answers.q8.join(' | ') : (answers.q8 || ''),
+    q9_presupuesto:    answers.q9 || '',
+    // Flags de inteligencia comercial
+    es_oportunidad: ['Sí — estamos evaluando opciones activamente','Tal vez — dependería de qué ofrece la alternativa'].includes(answers.q7) ? 'SÍ' : 'NO',
+    nivel_urgencia: answers.q4 || '',
+    tiene_presupuesto: (answers.q9 || '').startsWith('Sí') || (answers.q9 || '').includes('justificarse') ? 'SÍ/POSIBLE' : 'NO/N/D'
+  };
+
+  try{
+    await fetch(SHEETS_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    showToast('✓ Respuestas enviadas');
+  } catch(e){ console.warn('Sheets:', e); }
+
+  goTo('ty');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
